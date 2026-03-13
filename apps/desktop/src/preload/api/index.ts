@@ -15,6 +15,8 @@ import { McpAPI, createMcpAPI } from './modules/mcp-api';
 import { ProfileAPI, createProfileAPI } from './profile-api';
 import { ScreenshotAPI, createScreenshotAPI } from './screenshot-api';
 import { QueueAPI, createQueueAPI } from './queue-api';
+import { CopilotAPI, createCopilotAPI } from './modules/copilot-api';
+import { ProxyAPI, createProxyAPI } from './modules/proxy-api';
 
 export interface ElectronAPI extends
   ProjectAPI,
@@ -35,6 +37,10 @@ export interface ElectronAPI extends
   github: GitHubAPI;
   /** Queue routing API for rate limit recovery */
   queue: QueueAPI;
+  /** GitHub Copilot API for auth, usage, and model discovery */
+  copilot: CopilotAPI;
+  /** Multi-provider proxy API for bridging Claude SDK to other providers */
+  proxy: ProxyAPI;
 }
 
 export const createElectronAPI = (): ElectronAPI => ({
@@ -51,7 +57,9 @@ export const createElectronAPI = (): ElectronAPI => ({
   ...createProfileAPI(),
   ...createScreenshotAPI(),
   github: createGitHubAPI(),
-  queue: createQueueAPI()  // Queue routing for rate limit recovery
+  queue: createQueueAPI(),
+  copilot: createCopilotAPI(),
+  proxy: createProxyAPI()
 });
 
 // Export individual API creators for potential use in tests or specialized contexts
@@ -70,7 +78,9 @@ export {
   createClaudeCodeAPI,
   createMcpAPI,
   createScreenshotAPI,
-  createQueueAPI
+  createQueueAPI,
+  createCopilotAPI,
+  createProxyAPI
 };
 
 export type {
@@ -90,5 +100,7 @@ export type {
   ClaudeCodeAPI,
   McpAPI,
   ScreenshotAPI,
-  QueueAPI
+  QueueAPI,
+  CopilotAPI,
+  ProxyAPI
 };

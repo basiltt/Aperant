@@ -593,5 +593,20 @@ export const IPC_CHANNELS = {
   // Queue routing events (main -> renderer)
   QUEUE_PROFILE_SWAPPED: 'queue:profileSwapped',      // Task switched to different profile
   QUEUE_SESSION_CAPTURED: 'queue:sessionCaptured',    // Session ID captured from running task
-  QUEUE_BLOCKED_NO_PROFILES: 'queue:blockedNoProfiles' // All profiles unavailable
+  QUEUE_BLOCKED_NO_PROFILES: 'queue:blockedNoProfiles', // All profiles unavailable
+
+  // GitHub Copilot integration
+  COPILOT_CHECK_AUTH: 'copilot:checkAuth',
+  COPILOT_FETCH_USAGE: 'copilot:fetchUsage',
+  COPILOT_DEVICE_LOGIN: 'copilot:deviceLogin',
+  COPILOT_DEVICE_CODE: 'copilot:deviceCode',
+  COPILOT_EXCHANGE_TOKEN: 'copilot:exchangeToken',
+  COPILOT_DISCOVER_MODELS: 'copilot:discoverModels',
+
+  // Multi-provider proxy server
+  PROXY_START: 'proxy:start',
+  PROXY_STOP: 'proxy:stop',
+  PROXY_STATUS: 'proxy:status',
+  PROXY_SWITCH: 'proxy:switch',
+  PROXY_DISCOVER_MODELS: 'proxy:discoverModels'
 } as const;

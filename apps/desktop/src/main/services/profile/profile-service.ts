@@ -157,6 +157,8 @@ export async function createProfile(input: CreateProfileInput): Promise<APIProfi
       baseUrl: input.baseUrl.trim(),
       apiKey: input.apiKey.trim(),
       models: input.models,
+      providerType: input.providerType,
+      providerId: input.providerId,
       createdAt: now,
       updatedAt: now
     };

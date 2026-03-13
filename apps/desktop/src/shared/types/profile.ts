@@ -15,11 +15,20 @@ import type { ClaudeUsageData, ClaudeRateLimitEvent } from './agent';
  * API Profile - represents a custom API endpoint configuration
  * IMPORTANT: Named APIProfile (not Profile) to avoid conflicts with user profiles
  */
+/**
+ * Provider type identifier for distinguishing provider-specific profiles.
+ */
+export type ProviderType = 'anthropic' | 'openai' | 'copilot' | 'gemini';
+
 export interface APIProfile {
   id: string; // UUID v4
   name: string; // User-friendly name
   baseUrl: string; // API endpoint URL (e.g., https://api.anthropic.com)
   apiKey: string; // Full API key (never display in UI - use maskApiKey())
+  /** Provider type for this profile (e.g., 'copilot' for GitHub Copilot) */
+  providerType?: ProviderType;
+  /** Provider-specific identifier (e.g., 'github-copilot') */
+  providerId?: string;
   models?: {
     // OPTIONAL - only specify models to override
     default?: string; // Maps to ANTHROPIC_MODEL

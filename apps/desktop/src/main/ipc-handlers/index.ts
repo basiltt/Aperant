@@ -34,6 +34,8 @@ import { registerProfileHandlers } from './profile-handlers';
 import { registerScreenshotHandlers } from './screenshot-handlers';
 import { registerTerminalWorktreeIpcHandlers } from './terminal';
 import { registerCodexAuthHandlers } from './codex-auth-handlers';
+import { registerCopilotHandlers } from './copilot-handlers';
+import { registerProxyHandlers } from './proxy-handlers';
 import { notificationService } from '../notification-service';
 import { setAgentManagerRef } from './utils';
 
@@ -127,6 +129,12 @@ export function setupIpcHandlers(
   // Codex OAuth authentication handlers
   registerCodexAuthHandlers();
 
+  // GitHub Copilot handlers (auth, usage, device flow)
+  registerCopilotHandlers();
+
+  // Multi-provider proxy handlers (start/stop/switch)
+  registerProxyHandlers();
+
   console.warn('[IPC] All handler modules registered successfully');
 }
 
@@ -155,5 +163,7 @@ export {
   registerMcpHandlers,
   registerProfileHandlers,
   registerScreenshotHandlers,
-  registerCodexAuthHandlers
+  registerCodexAuthHandlers,
+  registerCopilotHandlers,
+  registerProxyHandlers
 };

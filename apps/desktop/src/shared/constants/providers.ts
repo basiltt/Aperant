@@ -73,4 +73,10 @@ export const PROVIDER_REGISTRY: ProviderInfo[] = [
     authMethods: ['api-key'], envVars: [],
     configFields: ['baseUrl'],
   },
+  {
+    id: 'github-copilot', name: 'GitHub Copilot', description: 'Use Claude and other models via GitHub Copilot subscription',
+    category: 'popular',
+    authMethods: ['oauth'], envVars: ['GITHUB_TOKEN'],
+    configFields: [], website: 'https://github.com/settings/copilot',
+  },
 ];
