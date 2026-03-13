@@ -1,0 +1,60 @@
+{
+  "active_provider": "anthropic",
+  "listen_host": "127.0.0.1",
+  "listen_port": 8765,
+  "log_level": "info",
+  "providers": {
+    "anthropic": {
+      "type": "anthropic",
+      "base_url": "https://api.anthropic.com",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "default_model": "claude-sonnet-4-20250514"
+    },
+    "copilot": {
+      "type": "copilot",
+      "base_url": "https://api.githubcopilot.com",
+      "github_token_env": "GITHUB_TOKEN",
+      "default_model": "claude-sonnet-4",
+      "editor_version": "vscode/1.99.0",
+      "plugin_version": "copilot-chat/0.26.7"
+    },
+    "openai": {
+      "type": "openai_compat",
+      "base_url": "https://api.openai.com/v1",
+      "api_key_env": "OPENAI_API_KEY",
+      "default_model": "gpt-4o"
+    },
+    "gemini": {
+      "type": "gemini",
+      "base_url": "https://generativelanguage.googleapis.com",
+      "api_key_env": "GEMINI_API_KEY",
+      "default_model": "gemini-2.5-pro"
+    },
+    "openrouter": {
+      "type": "openai_compat",
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key_env": "OPENROUTER_API_KEY",
+      "default_model": "anthropic/claude-sonnet-4"
+    },
+    "groq": {
+      "type": "openai_compat",
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key_env": "GROQ_API_KEY",
+      "default_model": "llama-3.3-70b-versatile"
+    }
+  },
+  "model_map": {
+    "claude-sonnet-4-20250514": {
+      "copilot": "claude-sonnet-4",
+      "openai": "gpt-4o",
+      "gemini": "gemini-2.5-pro",
+      "openrouter": "anthropic/claude-sonnet-4-20250514"
+    },
+    "claude-opus-4-20250514": {
+      "copilot": "claude-opus-4",
+      "openai": "gpt-4o",
+      "gemini": "gemini-2.5-pro",
+      "openrouter": "anthropic/claude-opus-4-20250514"
+    }
+  }
+}
