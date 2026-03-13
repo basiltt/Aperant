@@ -70,7 +70,11 @@ export const DEFAULT_APP_SETTINGS = {
   // GPU acceleration for terminal rendering
   // Default to 'off' until WebGL stability is proven across all GPU drivers.
   // Users can opt-in via Settings > Display > GPU Acceleration.
-  gpuAcceleration: 'off' as const
+  gpuAcceleration: 'off' as const,
+  // Proxy auto-start (disabled by default)
+  proxyEnabled: false,
+  // Default proxy provider
+  proxyProvider: 'copilot'
 };
 
 // ============================================

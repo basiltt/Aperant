@@ -1,0 +1,271 @@
+/*
+ * Elevation Design Tokens - Skeuomorphic Design System
+ *
+ * 12-level elevation hierarchy for creating realistic depth and material
+ * layering in the skeuomorphic interface system.
+ */
+
+:root {
+  /* ========================================
+   * BASE ELEVATION SCALE (0-12)
+   * ======================================== */
+
+  /* Level 0: Flat surfaces (backgrounds, embedded content) */
+  --elevation-0: none;
+
+  /* Level 1: Slight raise (content cards, panels) */
+  --elevation-1:
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.08);
+
+  /* Level 2: Standard elements (buttons, inputs, form controls) */
+  --elevation-2:
+    0 2px 6px rgba(0, 0, 0, 0.12),
+    0 1px 4px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* Level 3: Raised buttons, active interactive elements */
+  --elevation-3:
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+  /* Level 4: Navigation elements, toolbars, primary interface elements */
+  --elevation-4:
+    0 6px 16px rgba(0, 0, 0, 0.18),
+    0 3px 10px rgba(0, 0, 0, 0.12);
+
+  /* Level 5: Elevated toolbars, prominent interface sections */
+  --elevation-5:
+    0 8px 20px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+
+  /* Level 6: Floating action buttons, prominent controls */
+  --elevation-6:
+    0 10px 24px rgba(0, 0, 0, 0.22),
+    0 5px 14px rgba(0, 0, 0, 0.18);
+
+  /* Level 7: Modals, popovers, temporary overlays */
+  --elevation-7:
+    0 12px 28px rgba(0, 0, 0, 0.25),
+    0 6px 16px rgba(0, 0, 0, 0.2);
+
+  /* Level 8: Elevated modals, important overlays */
+  --elevation-8:
+    0 16px 32px rgba(0, 0, 0, 0.28),
+    0 8px 18px rgba(0, 0, 0, 0.22);
+
+  /* Level 9: High priority overlays, system dialogs */
+  --elevation-9:
+    0 20px 36px rgba(0, 0, 0, 0.3),
+    0 10px 20px rgba(0, 0, 0, 0.25);
+
+  /* Level 10: Tooltips, contextual information, maximum standard elevation */
+  --elevation-10:
+    0 24px 40px rgba(0, 0, 0, 0.32),
+    0 12px 22px rgba(0, 0, 0, 0.28);
+
+  /* Level 11: Critical overlays, emergency dialogs */
+  --elevation-11:
+    0 28px 44px rgba(0, 0, 0, 0.35),
+    0 14px 24px rgba(0, 0, 0, 0.3);
+
+  /* Level 12: System-level overlays, maximum elevation */
+  --elevation-12:
+    0 32px 48px rgba(0, 0, 0, 0.4),
+    0 16px 26px rgba(0, 0, 0, 0.35);
+
+  /* ========================================
+   * MATERIAL-SPECIFIC ELEVATION MAPPINGS
+   * ======================================== */
+
+  /* Paper Material Elevations - Subtle, document-like depth */
+  --elevation-paper-flat: var(--elevation-0);
+  --elevation-paper-card: var(--elevation-1);
+  --elevation-paper-raised: var(--elevation-2);
+  --elevation-paper-floating: var(--elevation-3);
+
+  /* Metal Material Elevations - Pronounced, mechanical depth */
+  --elevation-metal-control: var(--elevation-2);
+  --elevation-metal-button: var(--elevation-3);
+  --elevation-metal-toolbar: var(--elevation-4);
+  --elevation-metal-panel: var(--elevation-5);
+
+  /* Wood Material Elevations - Organic, substantial depth */
+  --elevation-wood-button: var(--elevation-3);
+  --elevation-wood-accent: var(--elevation-2);
+  --elevation-wood-panel: var(--elevation-4);
+  --elevation-wood-feature: var(--elevation-5);
+
+  /* Glass Material Elevations - Floating, ethereal depth */
+  --elevation-glass-overlay: var(--elevation-7);
+  --elevation-glass-modal: var(--elevation-9);
+  --elevation-glass-tooltip: var(--elevation-10);
+  --elevation-glass-system: var(--elevation-11);
+
+  /* Fabric Material Elevations - Minimal, textural depth */
+  --elevation-fabric-background: var(--elevation-0);
+  --elevation-fabric-texture: var(--elevation-1);
+
+  /* ========================================
+   * COMPONENT-SPECIFIC ELEVATION MAPPINGS
+   * ======================================== */
+
+  /* Button Elevations */
+  --elevation-button-primary: var(--elevation-wood-button);
+  --elevation-button-secondary: var(--elevation-metal-button);
+  --elevation-button-tertiary: var(--elevation-paper-raised);
+  --elevation-button-ghost: var(--elevation-0);
+
+  /* Form Element Elevations */
+  --elevation-input-frame: var(--elevation-metal-control);
+  --elevation-input-content: var(--elevation-paper-flat);
+  --elevation-select-trigger: var(--elevation-metal-control);
+  --elevation-select-dropdown: var(--elevation-glass-overlay);
+
+  /* Layout Element Elevations */
+  --elevation-card-content: var(--elevation-paper-card);
+  --elevation-card-interactive: var(--elevation-paper-raised);
+  --elevation-card-elevated: var(--elevation-paper-floating);
+
+  /* Navigation Elevations */
+  --elevation-nav-bar: var(--elevation-metal-toolbar);
+  --elevation-nav-item-active: var(--elevation-1); /* Inset appearance */
+  --elevation-nav-item-hover: var(--elevation-2);
+
+  /* Overlay Elevations */
+  --elevation-modal-backdrop: var(--elevation-0); /* Backdrop itself has no shadow */
+  --elevation-modal-container: var(--elevation-glass-modal);
+  --elevation-tooltip: var(--elevation-glass-tooltip);
+  --elevation-popover: var(--elevation-glass-overlay);
+
+  /* ========================================
+   * INTERACTION STATE ELEVATION MODIFIERS
+   * ======================================== */
+
+  /* Hover State - Increase elevation by 1 level */
+  --elevation-hover-1: var(--elevation-2);
+  --elevation-hover-2: var(--elevation-3);
+  --elevation-hover-3: var(--elevation-4);
+  --elevation-hover-4: var(--elevation-5);
+  --elevation-hover-5: var(--elevation-6);
+
+  /* Active/Pressed State - Decrease elevation by 1 level or flatten */
+  --elevation-active-2: var(--elevation-1);
+  --elevation-active-3: var(--elevation-2);
+  --elevation-active-4: var(--elevation-3);
+  --elevation-pressed-flat: var(--elevation-0);
+
+  /* Focus State - Maintain current elevation with outline */
+  --elevation-focus-ring: 0 0 0 3px rgba(139, 69, 19, 0.3);
+
+  /* Disabled State - Flatten all elevation */
+  --elevation-disabled: var(--elevation-0);
+
+  /* ========================================
+   * RESPONSIVE ELEVATION LIMITS
+   * ======================================== */
+
+  /* Mobile: Simplified shadows for performance */
+  --elevation-mobile-max: var(--elevation-4);
+  --elevation-mobile-modal: var(--elevation-6);
+
+  /* Tablet: Medium complexity shadows */
+  --elevation-tablet-max: var(--elevation-8);
+  --elevation-tablet-modal: var(--elevation-9);
+
+  /* Desktop: Full elevation range available */
+  --elevation-desktop-max: var(--elevation-12);
+  --elevation-desktop-modal: var(--elevation-11);
+
+  /* ========================================
+   * THEME-AWARE ELEVATION ADJUSTMENTS
+   * ======================================== */
+
+  /* Shadow color adjustments based on theme */
+  --elevation-shadow-opacity-multiplier: 1.0; /* Default theme */
+
+  /* Dark themes may need enhanced shadows */
+  --elevation-dark-shadow-boost: 1.2;
+
+  /* Light themes may need subtle shadows */
+  --elevation-light-shadow-reduction: 0.8;
+}
+
+/* ========================================
+ * ELEVATION UTILITY CLASSES
+ * ======================================== */
+
+/* Direct elevation classes for quick application */
+.elevation-0 { box-shadow: var(--elevation-0); }
+.elevation-1 { box-shadow: var(--elevation-1); }
+.elevation-2 { box-shadow: var(--elevation-2); }
+.elevation-3 { box-shadow: var(--elevation-3); }
+.elevation-4 { box-shadow: var(--elevation-4); }
+.elevation-5 { box-shadow: var(--elevation-5); }
+.elevation-6 { box-shadow: var(--elevation-6); }
+.elevation-7 { box-shadow: var(--elevation-7); }
+.elevation-8 { box-shadow: var(--elevation-8); }
+.elevation-9 { box-shadow: var(--elevation-9); }
+.elevation-10 { box-shadow: var(--elevation-10); }
+.elevation-11 { box-shadow: var(--elevation-11); }
+.elevation-12 { box-shadow: var(--elevation-12); }
+
+/* Material-specific elevation classes */
+.elevation-paper { box-shadow: var(--elevation-paper-card); }
+.elevation-metal { box-shadow: var(--elevation-metal-control); }
+.elevation-wood { box-shadow: var(--elevation-wood-button); }
+.elevation-glass { box-shadow: var(--elevation-glass-overlay); }
+
+/* Interactive state elevation classes */
+.elevation-hover { box-shadow: var(--elevation-3); }
+.elevation-active { box-shadow: var(--elevation-1); }
+.elevation-focus {
+  box-shadow: var(--elevation-2), var(--elevation-focus-ring);
+}
+.elevation-disabled { box-shadow: var(--elevation-disabled); }
+
+/* ========================================
+ * RESPONSIVE ELEVATION CLASSES
+ * ======================================== */
+
+/* Mobile: Simplified elevation */
+@media (max-width: 767px) {
+  .elevation-responsive {
+    box-shadow: var(--elevation-mobile-max);
+  }
+
+  /* Cap maximum elevation levels */
+  .elevation-5,
+  .elevation-6,
+  .elevation-7,
+  .elevation-8,
+  .elevation-9,
+  .elevation-10,
+  .elevation-11,
+  .elevation-12 {
+    box-shadow: var(--elevation-mobile-max);
+  }
+}
+
+/* Tablet: Medium elevation complexity */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .elevation-responsive {
+    box-shadow: var(--elevation-tablet-max);
+  }
+
+  /* Cap high elevation levels */
+  .elevation-9,
+  .elevation-10,
+  .elevation-11,
+  .elevation-12 {
+    box-shadow: var(--elevation-tablet-max);
+  }
+}
+
+/* Desktop: Full elevation range */
+@media (min-width: 1024px) {
+  .elevation-responsive {
+    box-shadow: var(--elevation-desktop-max);
+  }
+}

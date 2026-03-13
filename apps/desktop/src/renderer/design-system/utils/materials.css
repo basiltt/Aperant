@@ -1,0 +1,414 @@
+/*
+ * Material Utility Layer - Skeuomorphic Design System
+ *
+ * This layer provides reusable utility functions and classes for applying
+ * materials, managing states, and creating consistent patterns across components.
+ */
+
+:root {
+  /* ========================================
+   * MATERIAL UTILITY CLASSES
+   * ======================================== */
+
+  /* Material base classes that combine surface, texture, and elevation */
+  .material-paper-base {
+    background:
+      var(--texture-paper-fiber),
+      var(--material-paper-white);
+    color: var(--material-wood-walnut);
+    border-radius: var(--radius-material-soft);
+    transition: all var(--duration-paper-transition) var(--easing-paper-fold);
+  }
+
+  .material-metal-base {
+    background:
+      var(--texture-metal-brushed),
+      var(--material-metal-steel);
+    color: var(--material-wood-walnut);
+    border-radius: var(--radius-material-subtle);
+    transition: all var(--duration-metal-transition) var(--easing-metal-click);
+  }
+
+  .material-wood-base {
+    background:
+      var(--texture-wood-grain),
+      var(--material-wood-walnut);
+    color: white;
+    border-radius: var(--radius-material-natural);
+    transition: all var(--duration-wood-transition) var(--easing-wood-press);
+  }
+
+  .material-glass-base {
+    background: var(--material-glass-clear);
+    backdrop-filter: var(--material-glass-clear-blur);
+    border: 1px solid var(--material-glass-clear-border);
+    color: var(--material-wood-walnut);
+    border-radius: var(--radius-material-soft);
+    transition: all var(--duration-glass-transition) var(--easing-glass-float);
+  }
+
+  .material-fabric-base {
+    background:
+      var(--texture-fabric-linen),
+      var(--material-fabric-linen);
+    color: var(--material-wood-walnut);
+    border-radius: var(--radius-material-soft);
+    transition: all var(--duration-fabric-transition) var(--easing-fabric-soft);
+  }
+
+  /* ========================================
+   * UNIVERSAL INTERACTIVE STATE SYSTEM
+   * ======================================== */
+
+  /* Base interactive class - apply to all interactive elements */
+  .interactive-base {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transform: translate3d(0, 0, 0); /* GPU acceleration */
+    will-change: transform, box-shadow;
+  }
+
+  .interactive-base:hover {
+    transform: translate3d(0, -1px, 0);
+  }
+
+  .interactive-base:active {
+    transform: translate3d(0, 1px, 0) scale(0.99);
+    transition-duration: var(--duration-fast);
+  }
+
+  .interactive-base:focus-visible {
+    outline: 3px solid var(--focus-ring-paper);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .interactive-base:disabled {
+    opacity: var(--opacity-disabled);
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none;
+  }
+
+  /* Material-specific interactive behaviors */
+  .interactive-paper:hover {
+    box-shadow: var(--elevation-2);
+  }
+
+  .interactive-paper:active {
+    box-shadow: var(--elevation-0);
+  }
+
+  .interactive-metal:hover {
+    box-shadow: var(--elevation-3);
+    filter: brightness(1.05);
+  }
+
+  .interactive-metal:active {
+    box-shadow: var(--elevation-1);
+    filter: brightness(0.95);
+  }
+
+  .interactive-wood:hover {
+    box-shadow: var(--elevation-4);
+    filter: brightness(1.1);
+  }
+
+  .interactive-wood:active {
+    box-shadow: var(--elevation-1);
+    filter: brightness(0.9);
+  }
+
+  .interactive-glass:hover {
+    backdrop-filter: blur(16px);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .interactive-glass:active {
+    backdrop-filter: blur(8px);
+    opacity: 0.95;
+  }
+
+  /* ========================================
+   * COMPONENT ROLE MAPPING UTILITIES
+   * ======================================== */
+
+  /* Primary action components (Wood materials - 10% usage) */
+  .component-primary {
+    background:
+      var(--texture-wood-grain),
+      var(--material-wood-walnut);
+    color: white;
+    border: 2px solid var(--material-wood-walnut-shadow);
+    box-shadow: var(--elevation-wood-button);
+    font-weight: var(--typography-wood-body-weight);
+    text-shadow: var(--typography-wood-text-shadow);
+  }
+
+  /* Secondary action components (Metal materials - 25% usage) */
+  .component-secondary {
+    background:
+      var(--texture-metal-brushed),
+      var(--material-metal-steel);
+    color: var(--material-wood-walnut);
+    border: 2px solid var(--material-metal-steel-shadow);
+    box-shadow: var(--elevation-metal-control);
+    font-weight: var(--typography-metal-body-weight);
+    text-shadow: var(--typography-metal-text-shadow);
+  }
+
+  /* Content surfaces (Paper materials - 60% usage) */
+  .component-content {
+    background:
+      var(--texture-paper-fiber),
+      var(--material-paper-white);
+    color: var(--material-wood-walnut);
+    border: 1px solid var(--material-paper-white-shadow);
+    box-shadow: var(--elevation-paper-card);
+    font-weight: var(--typography-paper-body-weight);
+  }
+
+  /* Overlay surfaces (Glass materials - 4% usage) */
+  .component-overlay {
+    background: var(--material-glass-frosted);
+    backdrop-filter: var(--material-glass-frosted-blur);
+    border: 2px solid var(--material-glass-frosted-border);
+    color: var(--material-wood-walnut);
+    box-shadow: var(--elevation-glass-modal);
+    font-weight: var(--typography-glass-overlay-weight);
+    text-shadow: var(--typography-glass-text-shadow);
+  }
+
+  /* Background surfaces (Fabric materials - 1% usage) */
+  .component-background {
+    background:
+      var(--texture-fabric-linen),
+      var(--material-fabric-linen);
+    color: var(--material-wood-walnut);
+    font-weight: var(--typography-paper-body-weight);
+  }
+
+  /* ========================================
+   * ELEVATION UTILITY CLASSES
+   * ======================================== */
+
+  /* Semantic elevation mapping for different component types */
+  .elevation-button { box-shadow: var(--elevation-wood-button); }
+  .elevation-input { box-shadow: var(--elevation-metal-control); }
+  .elevation-card { box-shadow: var(--elevation-paper-card); }
+  .elevation-modal { box-shadow: var(--elevation-glass-modal); }
+  .elevation-navigation { box-shadow: var(--elevation-metal-toolbar); }
+
+  /* Interactive state elevation changes */
+  .elevation-hover { box-shadow: var(--elevation-3); }
+  .elevation-active { box-shadow: var(--elevation-1); }
+  .elevation-disabled { box-shadow: var(--elevation-0); }
+
+  /* ========================================
+   * RESPONSIVE DEGRADATION UTILITIES
+   * ======================================== */
+
+  /* Mobile: Simplified materials and interactions */
+  @media (max-width: 767px) {
+    .material-simplified {
+      /* Remove complex textures on mobile */
+      background: var(--material-base-color) !important;
+    }
+
+    .interactive-base {
+      /* Enhanced touch targets */
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .interactive-base:hover {
+      /* Remove hover states on touch devices */
+      transform: none;
+    }
+
+    .interactive-base:active {
+      /* Enhanced press feedback for touch */
+      transform: scale(0.95);
+    }
+
+    /* Limit elevation complexity */
+    .elevation-button { box-shadow: var(--elevation-mobile-max); }
+    .elevation-input { box-shadow: var(--elevation-2); }
+    .elevation-card { box-shadow: var(--elevation-1); }
+    .elevation-modal { box-shadow: var(--elevation-4); }
+  }
+
+  /* Tablet: Medium complexity */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .material-medium-complexity {
+      /* Single texture layer on tablet */
+      background: var(--texture-single-layer), var(--material-base-color);
+    }
+  }
+
+  /* ========================================
+   * STATE OVERLAY UTILITIES
+   * ======================================== */
+
+  /* Overlay states for interactive feedback */
+  .state-overlay-hover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--state-overlay-hover);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--duration-fast);
+    pointer-events: none;
+  }
+
+  .state-overlay-hover:hover::before {
+    opacity: 1;
+  }
+
+  .state-overlay-active::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--state-overlay-active);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--duration-fast);
+    pointer-events: none;
+  }
+
+  .state-overlay-active:active::after {
+    opacity: 1;
+  }
+
+  /* ========================================
+   * THEME INTEGRATION UTILITIES
+   * ======================================== */
+
+  /* Theme-aware material adaptation */
+  .theme-adaptive {
+    /* Materials automatically adapt through CSS custom properties */
+    /* No JavaScript needed - CSS handles all theme variations */
+  }
+
+  /* Theme-specific material adjustments */
+  [data-theme="dusk"] .material-wood-base {
+    --material-wood-walnut: var(--theme-dusk-wood-walnut);
+    --material-wood-walnut-highlight: var(--theme-dusk-wood-highlight);
+  }
+
+  [data-theme="ocean"] .material-wood-base {
+    --material-wood-walnut: var(--theme-ocean-wood-walnut);
+    --material-wood-walnut-highlight: var(--theme-ocean-wood-highlight);
+  }
+
+  [data-theme="lime"] .material-wood-base {
+    --material-wood-walnut: var(--theme-lime-wood-walnut);
+    --material-wood-walnut-highlight: var(--theme-lime-wood-highlight);
+  }
+
+  /* ========================================
+   * ACCESSIBILITY ENHANCEMENT UTILITIES
+   * ======================================== */
+
+  /* High contrast mode adaptations */
+  @media (prefers-contrast: high) {
+    .material-base {
+      /* Increase border contrast */
+      border-width: 2px;
+      border-color: currentColor;
+    }
+
+    .interactive-base:focus-visible {
+      /* Enhanced focus visibility */
+      outline-width: 4px;
+      outline-offset: 2px;
+    }
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .interactive-base {
+      transition: opacity var(--duration-fast) ease-out;
+    }
+
+    .interactive-base:hover {
+      transform: none;
+      opacity: 0.9;
+    }
+
+    .interactive-base:active {
+      transform: none;
+      opacity: 0.8;
+    }
+  }
+
+  /* ========================================
+   * PERFORMANCE OPTIMIZATION UTILITIES
+   * ======================================== */
+
+  /* GPU acceleration hints */
+  .gpu-accelerated {
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+
+  /* Performance-safe animations */
+  .perf-safe-transition {
+    /* Only animate transform, opacity, and filter for best performance */
+    transition-property: transform, opacity, filter;
+    transition-timing-function: var(--easing-material-standard);
+  }
+
+  /* ========================================
+   * COMPONENT SIZING UTILITIES
+   * ======================================== */
+
+  /* Standard size scale for consistent component sizing */
+  .size-xs {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-xs);
+  }
+
+  .size-sm {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-sm);
+  }
+
+  .size-md {
+    padding: var(--space-4) var(--space-5);
+    font-size: var(--font-size-base);
+  }
+
+  .size-lg {
+    padding: var(--space-5) var(--space-6);
+    font-size: var(--font-size-lg);
+  }
+
+  .size-xl {
+    padding: var(--space-6) var(--space-8);
+    font-size: var(--font-size-xl);
+  }
+
+  /* ========================================
+   * DEBUGGING UTILITIES (Development only)
+   * ======================================== */
+
+  /* Visual material debugging - shows material boundaries */
+  .debug-materials {
+    outline: 2px dashed red;
+    outline-offset: 2px;
+  }
+
+  .debug-materials::before {
+    content: attr(class);
+    position: absolute;
+    top: -20px;
+    left: 0;
+    font-size: 10px;
+    color: red;
+    background: white;
+    padding: 2px 4px;
+    font-family: monospace;
+  }
+}

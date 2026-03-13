@@ -7,9 +7,19 @@ export type CredentialSource = 'oauth' | 'api-key' | 'env' | 'keychain';
 export type BuiltinProvider =
   | 'anthropic' | 'openai' | 'google' | 'amazon-bedrock' | 'azure'
   | 'mistral' | 'groq' | 'xai' | 'openrouter' | 'zai'
-  | 'ollama' | 'openai-compatible';
+  | 'ollama' | 'openai-compatible' | 'github-copilot';
 
 export type BillingModel = 'subscription' | 'pay-per-use';
+
+/** Copilot premium requests usage data */
+export interface CopilotUsageData {
+  copilotPlan: string;
+  premiumUsedPercent: number;
+  premiumRemaining: number;
+  premiumEntitlement: number;
+  premiumUnlimited: boolean;
+  quotaResetDate?: string;
+}
 
 /** A user-defined model for custom endpoints */
 export interface CustomModel {
@@ -33,6 +43,8 @@ export interface ProviderAccount {
   updatedAt: number;
   claudeProfileId?: string;
   usage?: ClaudeUsageData;
+  /** Copilot premium requests usage */
+  copilotUsage?: CopilotUsageData;
   rateLimitEvents?: ClaudeRateLimitEvent[];
   /** User-configured models for openai-compatible endpoints */
   customModels?: CustomModel[];

@@ -72,11 +72,13 @@ export function ProviderAccountCard({ account, onEdit, onDelete, onReauth }: Pro
   const isOAuth = account.authType === 'oauth';
   const isCodex = isOAuth && account.provider === 'openai';
   const isClaudeCode = isOAuth && account.provider === 'anthropic';
+  const isCopilot = account.provider === 'github-copilot';
   const isZaiCodingPlan = account.provider === 'zai' && account.billingModel === 'subscription';
-  const isSubscription = isCodex || isClaudeCode || isZaiCodingPlan;
+  const isSubscription = isCodex || isClaudeCode || isZaiCodingPlan || isCopilot;
   const sessionPercent = account.usage?.sessionUsagePercent ?? 0;
   const weeklyPercent = account.usage?.weeklyUsagePercent ?? 0;
-  const hasUsage = (isOAuth || isZaiCodingPlan) && (sessionPercent > 0 || weeklyPercent > 0);
+  const hasUsage = (isOAuth || isZaiCodingPlan) && !isCopilot && (sessionPercent > 0 || weeklyPercent > 0);
+  const hasCopilotUsage = isCopilot && account.copilotUsage && !account.copilotUsage.premiumUnlimited;
 
   const authBadgeLabel = isCodex
     ? t('providers.card.codex')
@@ -163,6 +165,26 @@ export function ProviderAccountCard({ account, onEdit, onDelete, onReauth }: Pro
                 icon={TrendingUp}
                 tooltipKey="accounts.priority.weeklyUsage"
               />
+            </div>
+          )}
+
+          {/* Copilot premium requests usage */}
+          {hasCopilotUsage && account.copilotUsage && (
+            <div className="flex items-center gap-3 mt-2">
+              <UsageBar
+                percent={account.copilotUsage.premiumUsedPercent}
+                icon={TrendingUp}
+                tooltipKey="accounts.priority.premiumUsage"
+              />
+              <span className="text-[10px] text-muted-foreground tabular-nums">
+                {account.copilotUsage.premiumRemaining}/{account.copilotUsage.premiumEntitlement}
+              </span>
+            </div>
+          )}
+          {isCopilot && account.copilotUsage?.premiumUnlimited && (
+            <div className="flex items-center gap-1.5 mt-2">
+              <TrendingUp className="h-3 w-3 text-muted-foreground" />
+              <span className="text-[10px] text-muted-foreground">∞ Premium requests</span>
             </div>
           )}
         </div>

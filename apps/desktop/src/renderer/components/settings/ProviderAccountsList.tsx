@@ -16,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '../ui/alert-dialog';
-import type { BillingModel, BuiltinProvider, ProviderAccount, ProviderCategory } from '@shared/types/provider-account';
+import type { BillingModel, BuiltinProvider, CopilotUsageData, ProviderAccount, ProviderCategory } from '@shared/types/provider-account';
 
 export function ProviderAccountsList() {
   const { t } = useTranslation('settings');
@@ -57,7 +57,40 @@ export function ProviderAccountsList() {
     });
   }, [loadProviderAccounts, checkEnvCredentials]);
 
-  const allAccounts = providerAccounts;
+  // Fetch Copilot usage data for GitHub Copilot accounts
+  const [copilotUsage, setCopilotUsage] = useState<CopilotUsageData | null>(null);
+  useEffect(() => {
+    const copilotAccounts = providerAccounts.filter(a => a.provider === 'github-copilot');
+    if (copilotAccounts.length === 0) return;
+
+    const fetchUsage = async () => {
+      try {
+        const result = await window.electronAPI.copilot?.fetchCopilotUsage?.();
+        if (result?.success && result.data) {
+          const premium = result.data.premiumRequests;
+          setCopilotUsage({
+            copilotPlan: result.data.copilotPlan,
+            premiumUsedPercent: 100 - (premium?.percentRemaining ?? 100),
+            premiumRemaining: premium?.remaining ?? 0,
+            premiumEntitlement: premium?.entitlement ?? 0,
+            premiumUnlimited: premium?.unlimited ?? false,
+            quotaResetDate: result.data.quotaResetDate,
+          });
+        }
+      } catch {
+        // Non-fatal - usage data optional
+      }
+    };
+
+    fetchUsage();
+  }, [providerAccounts]);
+
+  // Inject Copilot usage into matching accounts
+  const allAccounts = copilotUsage
+    ? providerAccounts.map(a =>
+        a.provider === 'github-copilot' ? { ...a, copilotUsage } : a
+      )
+    : providerAccounts;
 
   // Group accounts by provider, preserving PROVIDER_REGISTRY order
   const accountsByProvider = PROVIDER_REGISTRY.reduce<Map<BuiltinProvider, ProviderAccount[]>>(

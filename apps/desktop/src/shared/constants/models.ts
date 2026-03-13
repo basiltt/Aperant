@@ -71,6 +71,14 @@ export const ALL_AVAILABLE_MODELS: ModelOption[] = [
   { value: 'glm-4.7', label: 'GLM-4.7', provider: 'zai', description: 'Previous flagship', capabilities: { thinking: false, tools: true, vision: false, contextWindow: 128000 } },
   { value: 'glm-4.6v', label: 'GLM-4.6V', provider: 'zai', description: 'Multimodal', capabilities: { thinking: false, tools: true, vision: true, contextWindow: 128000 } },
   { value: 'glm-4.5-flash', label: 'GLM-4.5 Flash', provider: 'zai', description: 'Fast', capabilities: { thinking: false, tools: true, vision: false, contextWindow: 128000 } },
+  // GitHub Copilot (available via proxy)
+  { value: 'claude-sonnet-4', label: 'Claude Sonnet 4', provider: 'github-copilot', description: 'Balanced via Copilot', capabilities: { thinking: true, tools: true, vision: true, contextWindow: 200000 } },
+  { value: 'claude-3.5-sonnet', label: 'Claude 3.5 Sonnet', provider: 'github-copilot', description: 'Legacy via Copilot', capabilities: { thinking: false, tools: true, vision: true, contextWindow: 200000 } },
+  { value: 'gpt-4o', label: 'GPT-4o', provider: 'github-copilot', description: 'OpenAI via Copilot', capabilities: { thinking: false, tools: true, vision: true, contextWindow: 128000 } },
+  { value: 'gpt-4.1', label: 'GPT-4.1', provider: 'github-copilot', description: 'Latest via Copilot', capabilities: { thinking: false, tools: true, vision: true, contextWindow: 128000 } },
+  { value: 'o3-mini', label: 'o3 Mini', provider: 'github-copilot', description: 'Reasoning via Copilot', capabilities: { thinking: true, tools: true, vision: false, contextWindow: 200000 } },
+  { value: 'o4-mini', label: 'o4 Mini', provider: 'github-copilot', description: 'Fast reasoning via Copilot', capabilities: { thinking: true, tools: true, vision: false, contextWindow: 200000 } },
+  { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash', provider: 'github-copilot', description: 'Google via Copilot', capabilities: { thinking: false, tools: true, vision: true, contextWindow: 1048576 } },
 ];
 
 // Maps model shorthand to actual Claude model IDs
@@ -321,6 +329,12 @@ export const PROVIDER_PRESET_DEFINITIONS: Partial<Record<BuiltinProvider, Record
     complex:  { primaryModel: '', primaryThinking: 'low', phaseModels: { spec: '', planning: '', coding: '', qa: '' }, phaseThinking: { spec: 'low', planning: 'low', coding: 'low', qa: 'low' } },
     balanced: { primaryModel: '', primaryThinking: 'low', phaseModels: { spec: '', planning: '', coding: '', qa: '' }, phaseThinking: { spec: 'low', planning: 'low', coding: 'low', qa: 'low' } },
     quick:    { primaryModel: '', primaryThinking: 'low', phaseModels: { spec: '', planning: '', coding: '', qa: '' }, phaseThinking: { spec: 'low', planning: 'low', coding: 'low', qa: 'low' } },
+  },
+  'github-copilot': {
+    auto:     { primaryModel: 'claude-sonnet-4', primaryThinking: 'low', phaseModels: { spec: 'claude-sonnet-4', planning: 'claude-sonnet-4', coding: 'claude-sonnet-4', qa: 'claude-sonnet-4' },             phaseThinking: { spec: 'low', planning: 'low', coding: 'low', qa: 'low' } },
+    complex:  { primaryModel: 'claude-sonnet-4', primaryThinking: 'medium', phaseModels: { spec: 'claude-sonnet-4', planning: 'claude-sonnet-4', coding: 'claude-sonnet-4', qa: 'claude-sonnet-4' },           phaseThinking: { spec: 'medium', planning: 'medium', coding: 'medium', qa: 'medium' } },
+    balanced: { primaryModel: 'gpt-4o',          primaryThinking: 'low', phaseModels: { spec: 'gpt-4o', planning: 'gpt-4o', coding: 'gpt-4o', qa: 'gpt-4o' },                                                 phaseThinking: { spec: 'low', planning: 'low', coding: 'low', qa: 'low' } },
+    quick:    { primaryModel: 'gpt-4o',          primaryThinking: 'low', phaseModels: { spec: 'gpt-4o', planning: 'gpt-4o', coding: 'gpt-4o', qa: 'gpt-4o' },                                                 phaseThinking: { spec: 'low', planning: 'low', coding: 'low', qa: 'low' } },
   },
 };
 

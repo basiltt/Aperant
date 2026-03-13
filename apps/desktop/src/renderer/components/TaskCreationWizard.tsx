@@ -12,7 +12,7 @@
  */
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2, ChevronDown, ChevronUp, RotateCcw, FolderTree, GitBranch, Info } from 'lucide-react';
+import { Loader2, ChevronDown, ChevronUp, RotateCcw, FolderTree, GitBranch, Info, Wifi, WifiOff } from 'lucide-react';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { Combobox } from './ui/combobox';
@@ -27,6 +27,7 @@ import { buildBranchOptions } from '../lib/branch-utils';
 import { cn } from '../lib/utils';
 import type { TaskCategory, TaskPriority, TaskComplexity, TaskImpact, TaskMetadata, ImageAttachment, TaskDraft, ModelType, ThinkingLevel, ReferencedFile, GitBranchDetail } from '../../shared/types';
 import type { PhaseModelConfig, PhaseThinkingConfig } from '../../shared/types/settings';
+import type { PhaseProviderConfig } from './AgentProfileSelector';
 import {
   DEFAULT_AGENT_PROFILES,
   DEFAULT_PHASE_MODELS,
@@ -135,6 +136,48 @@ export function TaskCreationWizard({
   const [thinkingLevel, setThinkingLevel] = useState<ThinkingLevel | ''>(selectedProfile.thinkingLevel);
   const [phaseModels, setPhaseModels] = useState<PhaseModelConfig | undefined>(resolvedPhaseModels);
   const [phaseThinking, setPhaseThinking] = useState<PhaseThinkingConfig | undefined>(resolvedPhaseThinking);
+  const [phaseProviders, setPhaseProviders] = useState<PhaseProviderConfig | undefined>(undefined);
+
+  // Proxy status for GitHub Copilot phases
+  const needsProxy = useMemo(() => {
+    if (!phaseProviders) return false;
+    return Object.values(phaseProviders).includes('github-copilot' as any);
+  }, [phaseProviders]);
+  const [proxyStatus, setProxyStatus] = useState<'stopped' | 'starting' | 'running' | 'error'>('stopped');
+
+  // Poll proxy status when needed
+  useEffect(() => {
+    if (!needsProxy) {
+      setProxyStatus('stopped');
+      return;
+    }
+    const checkStatus = async () => {
+      try {
+        const result = await window.electronAPI.proxy?.proxyStatus?.();
+        setProxyStatus(result?.running ? 'running' : 'stopped');
+      } catch {
+        setProxyStatus('stopped');
+      }
+    };
+    checkStatus();
+    const interval = setInterval(checkStatus, 3000);
+    return () => clearInterval(interval);
+  }, [needsProxy]);
+
+  const handleProxyToggle = async () => {
+    try {
+      if (proxyStatus === 'running') {
+        setProxyStatus('stopped');
+        await window.electronAPI.proxy?.proxyStop?.();
+      } else {
+        setProxyStatus('starting');
+        await window.electronAPI.proxy?.proxyStart?.();
+        setProxyStatus('running');
+      }
+    } catch {
+      setProxyStatus('error');
+    }
+  };
 
   // Images and files
   const [images, setImages] = useState<ImageAttachment[]>([]);
@@ -464,6 +507,12 @@ export function TaskCreationWizard({
         metadata.phaseThinking = phaseThinking;
       }
 
+      // Per-phase provider selection from task creation UI
+      if (phaseProviders) {
+        metadata.phaseProviders = phaseProviders as Record<string, string>;
+        metadata.isAutoProfile = true;
+      }
+
       // Cross-provider mode: override phaseModels/phaseThinking from mixed config
       // and add phaseProviders to metadata
       if (settings.customMixedProfileActive && settings.customMixedPhaseConfig) {
@@ -708,6 +757,8 @@ export function TaskCreationWizard({
           onThinkingLevelChange={setThinkingLevel}
           onPhaseModelsChange={setPhaseModels}
           onPhaseThinkingChange={setPhaseThinking}
+          phaseProviders={phaseProviders}
+          onPhaseProvidersChange={setPhaseProviders}
           category={category}
           priority={priority}
           complexity={complexity}
@@ -742,6 +793,43 @@ export function TaskCreationWizard({
             />
           )}
         </TaskFormFields>
+
+        {/* Proxy Status - shown when any phase uses GitHub Copilot */}
+        {needsProxy && (
+          <div className="rounded-lg border border-border bg-muted/30 p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {proxyStatus === 'running' ? (
+                <Wifi className="h-4 w-4 text-green-500" />
+              ) : proxyStatus === 'starting' ? (
+                <Loader2 className="h-4 w-4 text-yellow-500 animate-spin" />
+              ) : (
+                <WifiOff className="h-4 w-4 text-muted-foreground" />
+              )}
+              <div>
+                <span className="text-sm font-medium">Copilot Proxy</span>
+                <span className={cn(
+                  'ml-2 text-xs px-1.5 py-0.5 rounded',
+                  proxyStatus === 'running' && 'bg-green-500/10 text-green-500',
+                  proxyStatus === 'starting' && 'bg-yellow-500/10 text-yellow-500',
+                  proxyStatus === 'stopped' && 'bg-muted text-muted-foreground',
+                  proxyStatus === 'error' && 'bg-red-500/10 text-red-500',
+                )}>
+                  {proxyStatus === 'running' ? 'Connected' : proxyStatus === 'starting' ? 'Starting...' : proxyStatus === 'error' ? 'Error' : 'Stopped'}
+                </span>
+              </div>
+            </div>
+            <Button
+              type="button"
+              variant={proxyStatus === 'running' ? 'outline' : 'default'}
+              size="sm"
+              onClick={handleProxyToggle}
+              disabled={proxyStatus === 'starting' || isCreating}
+              className="text-xs h-7"
+            >
+              {proxyStatus === 'running' ? 'Stop' : 'Start Proxy'}
+            </Button>
+          </div>
+        )}
 
         {/* Git Options Toggle - unique to creation */}
         <button

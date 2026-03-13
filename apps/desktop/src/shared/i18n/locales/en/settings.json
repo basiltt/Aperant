@@ -694,6 +694,7 @@
       "needsReauthHint": "This profile's refresh token is invalid. Click to re-authenticate.",
       "sessionUsage": "Session usage (5-hour window)",
       "weeklyUsage": "Weekly usage (7-day window)",
+      "premiumUsage": "Premium requests (monthly)",
       "oauthSection": "Claude Accounts (cycle through first)",
       "apiSection": "Fallback Endpoints (when all accounts exhausted)",
       "tipTitle": "How priority works",

@@ -13,7 +13,12 @@ import { spawn, execSync, type ChildProcess } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import http from 'http';
+import { fileURLToPath } from 'url';
 import { IPC_CHANNELS } from '../../shared/constants';
+
+// ESM-compatible __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import type { IPCResult } from '../../shared/types';
 import { resolveGitHubToken } from './copilot-handlers';
 import { getAPIProfileEnv } from '../services/profile';
@@ -244,7 +249,7 @@ function killStaleProxy(): void {
   }
 }
 
-async function startProxyInternal(provider?: string): Promise<IPCResult<{ pid: number }>> {
+export async function startProxyInternal(provider: string = 'copilot'): Promise<IPCResult<{ pid: number }>> {
   const normalizedProvider = normalizeProxyProvider(provider);
   try {
     // Already running?

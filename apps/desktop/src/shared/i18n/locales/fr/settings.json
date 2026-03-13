@@ -694,6 +694,7 @@
       "needsReauthHint": "Le token de rafraîchissement de ce profil est invalide. Cliquez pour vous réauthentifier.",
       "sessionUsage": "Utilisation de session (fenêtre de 5 heures)",
       "weeklyUsage": "Utilisation hebdomadaire (fenêtre de 7 jours)",
+      "premiumUsage": "Requêtes premium (mensuel)",
       "oauthSection": "Comptes Claude (utilisés en premier)",
       "apiSection": "Points de terminaison de secours (quand tous les comptes sont épuisés)",
       "tipTitle": "Comment fonctionne la priorité",

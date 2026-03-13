@@ -5,7 +5,7 @@
  * single provider-grouped list using ProviderAccountsList. The automatic
  * account switching section (AccountPriorityList) is kept below.
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   RefreshCw,
@@ -13,7 +13,11 @@ import {
   AlertCircle,
   Clock,
   TrendingUp,
-  Info
+  Info,
+  Wifi,
+  WifiOff,
+  Loader2,
+  Server
 } from 'lucide-react';
 import { Label } from '../ui/label';
 import { Switch } from '../ui/switch';
@@ -22,6 +26,7 @@ import { SettingsSection } from './SettingsSection';
 import { AccountPriorityList, type UnifiedAccount } from './AccountPriorityList';
 import { ProviderAccountsList } from './ProviderAccountsList';
 import { useSettingsStore } from '../../stores/settings-store';
+import { saveSettings as persistSettings } from '../../stores/settings-store';
 import { useToast } from '../../hooks/use-toast';
 import { PROVIDER_REGISTRY } from '@shared/constants/providers';
 import type { AppSettings, ClaudeAutoSwitchSettings, ProfileUsageSummary } from '../../../shared/types';
@@ -40,6 +45,130 @@ export function AccountSettings({ settings, onSettingsChange, isOpen }: AccountS
   // Derive priority orders from Zustand store (single source of truth)
   const priorityOrder = settings.globalPriorityOrder ?? [];
   const crossProviderPriorityOrder = settings.crossProviderPriorityOrder ?? [];
+
+  // ============================================
+  // Proxy state
+  // ============================================
+  const [proxyStatus, setProxyStatus] = useState<'stopped' | 'running' | 'starting' | 'error'>('stopped');
+  const [proxyProvider, setProxyProvider] = useState<string | undefined>();
+  const [availableProviders, setAvailableProviders] = useState<string[]>([]);
+  const [proxyToggling, setProxyToggling] = useState(false);
+  const [proxySwitching, setProxySwitching] = useState(false);
+  const proxyPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const PROXY_PROVIDER_OPTIONS = [
+    { value: 'copilot', label: 'GitHub Copilot' },
+    { value: 'openai', label: 'OpenAI' },
+    { value: 'gemini', label: 'Google Gemini' },
+    { value: 'anthropic', label: 'Anthropic' },
+    { value: 'openrouter', label: 'OpenRouter' },
+    { value: 'groq', label: 'Groq' },
+  ];
+
+  const pollProxyStatus = useCallback(async () => {
+    try {
+      const result = await window.electronAPI.proxy?.proxyStatus?.();
+      if (result?.success && result.data?.running) {
+        setProxyStatus('running');
+        setProxyProvider(result.data.active_provider);
+        if (result.data.available_providers?.length) {
+          setAvailableProviders(result.data.available_providers);
+        }
+      } else {
+        setProxyStatus('stopped');
+        setProxyProvider(undefined);
+      }
+    } catch {
+      setProxyStatus('stopped');
+      setProxyProvider(undefined);
+    }
+  }, []);
+
+  // Poll proxy status when settings dialog is open
+  useEffect(() => {
+    if (isOpen) {
+      pollProxyStatus();
+      proxyPollRef.current = setInterval(pollProxyStatus, 3000);
+    }
+    return () => {
+      if (proxyPollRef.current) {
+        clearInterval(proxyPollRef.current);
+        proxyPollRef.current = null;
+      }
+    };
+  }, [isOpen, pollProxyStatus]);
+
+  const handleProxyProviderChange = useCallback(async (newProvider: string) => {
+    // Persist the choice immediately to disk and update in-memory state
+    onSettingsChange({ ...settings, proxyProvider: newProvider });
+    await persistSettings({ proxyProvider: newProvider });
+
+    // If proxy is running, switch live
+    if (proxyStatus === 'running') {
+      setProxySwitching(true);
+      try {
+        const result = await window.electronAPI.proxy?.proxySwitch?.(newProvider);
+        if (result?.success) {
+          setProxyProvider(newProvider);
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Proxy Error',
+            description: result?.error || 'Failed to switch provider',
+          });
+        }
+      } catch (err) {
+        toast({
+          variant: 'destructive',
+          title: 'Proxy Error',
+          description: err instanceof Error ? err.message : 'Failed to switch provider',
+        });
+      } finally {
+        setProxySwitching(false);
+        await pollProxyStatus();
+      }
+    }
+  }, [settings, onSettingsChange, proxyStatus, pollProxyStatus, toast]);
+
+  const handleProxyToggle = useCallback(async (enabled: boolean) => {
+    setProxyToggling(true);
+    try {
+      if (enabled) {
+        setProxyStatus('starting');
+        const selectedProvider = settings.proxyProvider || 'copilot';
+        const result = await window.electronAPI.proxy?.proxyStart?.(selectedProvider);
+        if (result?.success) {
+          setProxyStatus('running');
+          onSettingsChange({ ...settings, proxyEnabled: true });
+          await persistSettings({ proxyEnabled: true });
+        } else {
+          setProxyStatus('error');
+          toast({
+            variant: 'destructive',
+            title: 'Proxy Error',
+            description: result?.error || 'Failed to start proxy server',
+          });
+          // Don't persist the setting if it failed
+          return;
+        }
+      } else {
+        await window.electronAPI.proxy?.proxyStop?.();
+        setProxyStatus('stopped');
+        setProxyProvider(undefined);
+        onSettingsChange({ ...settings, proxyEnabled: false });
+        await persistSettings({ proxyEnabled: false });
+      }
+    } catch (err) {
+      setProxyStatus('error');
+      toast({
+        variant: 'destructive',
+        title: 'Proxy Error',
+        description: err instanceof Error ? err.message : 'Proxy operation failed',
+      });
+    } finally {
+      setProxyToggling(false);
+    }
+  }, [settings, onSettingsChange, toast]);
 
   // ============================================
   // Auto-switch settings state
@@ -253,6 +382,87 @@ export function AccountSettings({ settings, onSettingsChange, isOpen }: AccountS
       description={t('accounts.description')}
     >
       <div className="space-y-6">
+        {/* Proxy Server Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Server className="h-4 w-4 text-muted-foreground" />
+            <h4 className="text-sm font-semibold text-foreground">Multi-Provider Proxy</h4>
+          </div>
+
+          <div className="rounded-lg bg-muted/30 border border-border p-4 space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Routes Claude Code SDK requests through a local proxy to enable using GitHub Copilot, OpenAI, Gemini, and other providers.
+            </p>
+
+            {/* Enable toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-sm font-medium">Enable Proxy Server</Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Auto-starts on app launch when enabled
+                </p>
+              </div>
+              <Switch
+                checked={settings.proxyEnabled ?? false}
+                onCheckedChange={handleProxyToggle}
+                disabled={proxyToggling}
+              />
+            </div>
+
+            {/* Provider selector */}
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-sm font-medium">Proxy Provider</Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Backend provider the proxy routes requests to
+                </p>
+              </div>
+              <select
+                value={settings.proxyProvider || 'copilot'}
+                onChange={(e) => handleProxyProviderChange(e.target.value)}
+                disabled={proxyToggling || proxySwitching}
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                {PROXY_PROVIDER_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Status indicator */}
+            <div className="flex items-center gap-3 rounded-md bg-background/50 border border-border/50 px-3 py-2">
+              {proxyToggling || proxyStatus === 'starting' ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                  <span className="text-sm text-blue-500 font-medium">Starting...</span>
+                </>
+              ) : proxyStatus === 'running' ? (
+                <>
+                  <Wifi className="h-4 w-4 text-green-500" />
+                  <span className="text-sm text-green-500 font-medium">Running</span>
+                  {proxyProvider && (
+                    <span className="text-xs text-muted-foreground ml-auto capitalize">
+                      Active: {PROXY_PROVIDER_OPTIONS.find(o => o.value === proxyProvider)?.label || proxyProvider}
+                    </span>
+                  )}
+                </>
+              ) : proxyStatus === 'error' ? (
+                <>
+                  <AlertCircle className="h-4 w-4 text-red-500" />
+                  <span className="text-sm text-red-500 font-medium">Error</span>
+                </>
+              ) : (
+                <>
+                  <WifiOff className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground font-medium">Stopped</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Provider accounts list - replaces the former tabs */}
         <ProviderAccountsList />
 

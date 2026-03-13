@@ -1,0 +1,196 @@
+/*
+ * Spacing Design Tokens - Skeuomorphic Design System
+ *
+ * Material-aware spacing system that considers the physical properties
+ * of different materials and their appropriate spatial relationships.
+ */
+
+:root {
+  /* ========================================
+   * BASE SPACING SCALE
+   * ======================================== */
+
+  /* Base spacing unit: 4px (consistent with design systems) */
+  --space-unit: 4px;
+
+  /* Standard spacing scale */
+  --space-0: 0;
+  --space-1: calc(var(--space-unit) * 1);   /* 4px - minimal gaps */
+  --space-2: calc(var(--space-unit) * 2);   /* 8px - tight spacing */
+  --space-3: calc(var(--space-unit) * 3);   /* 12px - compact elements */
+  --space-4: calc(var(--space-unit) * 4);   /* 16px - standard spacing */
+  --space-5: calc(var(--space-unit) * 5);   /* 20px - comfortable gaps */
+  --space-6: calc(var(--space-unit) * 6);   /* 24px - section spacing */
+  --space-8: calc(var(--space-unit) * 8);   /* 32px - component separation */
+  --space-10: calc(var(--space-unit) * 10); /* 40px - major sections */
+  --space-12: calc(var(--space-unit) * 12); /* 48px - layout spacing */
+  --space-16: calc(var(--space-unit) * 16); /* 64px - hero sections */
+  --space-20: calc(var(--space-unit) * 20); /* 80px - page sections */
+
+  /* ========================================
+   * MATERIAL-SPECIFIC SPACING ADJUSTMENTS
+   * ======================================== */
+
+  /* Paper materials - generous, comfortable spacing */
+  --space-paper-padding: var(--space-4);      /* Standard content padding */
+  --space-paper-margin: var(--space-3);       /* Comfortable margins */
+  --space-paper-gap: var(--space-2);          /* Tight gaps between paper elements */
+
+  /* Metal materials - precise, mechanical spacing */
+  --space-metal-padding: var(--space-3);      /* Compact padding for controls */
+  --space-metal-margin: var(--space-2);       /* Tight margins for precision */
+  --space-metal-gap: var(--space-1);          /* Minimal gaps for control groups */
+
+  /* Wood materials - substantial, natural spacing */
+  --space-wood-padding: var(--space-5);       /* Generous padding for important actions */
+  --space-wood-margin: var(--space-4);        /* Comfortable margins */
+  --space-wood-gap: var(--space-3);           /* Natural gaps between elements */
+
+  /* Glass materials - floating, airy spacing */
+  --space-glass-padding: var(--space-6);      /* Extra padding for floating content */
+  --space-glass-margin: var(--space-5);       /* Generous margins for separation */
+  --space-glass-gap: var(--space-4);          /* Comfortable gaps for overlay content */
+
+  /* Fabric materials - minimal, subtle spacing */
+  --space-fabric-padding: var(--space-1);     /* Minimal padding for backgrounds */
+  --space-fabric-margin: var(--space-1);      /* Subtle margins */
+  --space-fabric-gap: var(--space-0);         /* No gaps - seamless fabric */
+
+  /* ========================================
+   * COMPONENT-SPECIFIC SPACING TOKENS
+   * ======================================== */
+
+  /* Button spacing */
+  --space-button-padding-xs: var(--space-2) var(--space-3);
+  --space-button-padding-sm: var(--space-3) var(--space-4);
+  --space-button-padding-md: var(--space-wood-padding) var(--space-6);
+  --space-button-padding-lg: var(--space-5) var(--space-8);
+  --space-button-padding-xl: var(--space-6) var(--space-10);
+  --space-button-gap: var(--space-2); /* Gap between button and icon */
+
+  /* Form element spacing */
+  --space-form-field-margin: var(--space-4);
+  --space-form-label-margin: var(--space-2);
+  --space-form-input-padding: var(--space-paper-padding) var(--space-5);
+  --space-form-group-gap: var(--space-6);
+
+  /* Card spacing */
+  --space-card-padding-sm: var(--space-4);
+  --space-card-padding-md: var(--space-paper-padding) var(--space-6);
+  --space-card-padding-lg: var(--space-6) var(--space-8);
+  --space-card-gap: var(--space-4); /* Gap between cards */
+  --space-card-header-padding: var(--space-4) var(--space-6);
+  --space-card-content-padding: var(--space-paper-padding) var(--space-6);
+
+  /* Navigation spacing */
+  --space-nav-padding: var(--space-metal-padding) var(--space-5);
+  --space-nav-item-gap: var(--space-metal-gap);
+  --space-nav-section-margin: var(--space-8);
+
+  /* Modal spacing */
+  --space-modal-padding: var(--space-glass-padding);
+  --space-modal-margin: var(--space-glass-margin);
+  --space-modal-backdrop-padding: var(--space-8);
+
+  /* ========================================
+   * LAYOUT GRID SPACING
+   * ======================================== */
+
+  /* Grid gaps for different layout densities */
+  --space-grid-tight: var(--space-2);      /* Compact grids */
+  --space-grid-normal: var(--space-4);     /* Standard grid spacing */
+  --space-grid-relaxed: var(--space-6);    /* Generous grid spacing */
+  --space-grid-loose: var(--space-8);      /* Spacious grid layouts */
+
+  /* Container spacing */
+  --space-container-padding-xs: var(--space-4);
+  --space-container-padding-sm: var(--space-6);
+  --space-container-padding-md: var(--space-8);
+  --space-container-padding-lg: var(--space-12);
+  --space-container-padding-xl: var(--space-16);
+
+  /* ========================================
+   * RESPONSIVE SPACING ADJUSTMENTS
+   * ======================================== */
+
+  /* Mobile spacing - more compact */
+  --space-mobile-unit: 3px; /* Slightly smaller base unit */
+  --space-mobile-padding: calc(var(--space-mobile-unit) * 3);
+  --space-mobile-margin: calc(var(--space-mobile-unit) * 2);
+  --space-mobile-gap: calc(var(--space-mobile-unit) * 2);
+
+  /* Tablet spacing - medium density */
+  --space-tablet-unit: var(--space-unit);
+  --space-tablet-padding: var(--space-3);
+  --space-tablet-margin: var(--space-3);
+  --space-tablet-gap: var(--space-2);
+
+  /* Desktop spacing - full scale */
+  --space-desktop-unit: var(--space-unit);
+  --space-desktop-padding: var(--space-4);
+  --space-desktop-margin: var(--space-4);
+  --space-desktop-gap: var(--space-3);
+
+  /* ========================================
+   * TYPOGRAPHY SPACING
+   * ======================================== */
+
+  /* Line height and spacing for different materials */
+  --space-text-line-height-paper: 1.6;    /* Comfortable reading */
+  --space-text-line-height-metal: 1.4;    /* Compact for controls */
+  --space-text-line-height-wood: 1.5;     /* Balanced for actions */
+  --space-text-line-height-glass: 1.6;    /* Airy for overlays */
+
+  /* Paragraph spacing */
+  --space-text-paragraph-margin: var(--space-4);
+  --space-text-heading-margin: var(--space-6) 0 var(--space-3) 0;
+
+  /* List spacing */
+  --space-list-item-padding: var(--space-2) 0;
+  --space-list-nested-margin: var(--space-4);
+
+  /* ========================================
+   * INTERACTIVE ELEMENT SPACING
+   * ======================================== */
+
+  /* Focus ring spacing */
+  --space-focus-offset: 2px;
+  --space-focus-width: 3px;
+
+  /* Touch target spacing (WCAG compliance) */
+  --space-touch-target-min: 44px;
+  --space-touch-padding: var(--space-3);
+
+  /* Hover zone expansion */
+  --space-hover-expansion: 4px; /* Invisible expansion for easier targeting */
+
+  /* ========================================
+   * SEMANTIC SPACING TOKENS
+   * ======================================== */
+
+  /* Status element spacing */
+  --space-status-padding: var(--space-2) var(--space-3);
+  --space-status-margin: var(--space-2);
+  --space-status-gap: var(--space-2);
+
+  /* Icon spacing */
+  --space-icon-margin: var(--space-2);
+  --space-icon-padding: var(--space-1);
+
+  /* Badge and label spacing */
+  --space-badge-padding: var(--space-1) var(--space-2);
+  --space-label-margin: var(--space-2);
+
+  /* ========================================
+   * ANIMATION SPACING
+   * ======================================== */
+
+  /* Transform distances for animations */
+  --space-transform-subtle: 1px;     /* Minimal movement */
+  --space-transform-normal: 2px;     /* Standard hover lift */
+  --space-transform-prominent: 4px;  /* Noticeable movement */
+
+  /* Slide animation distances */
+  --space-slide-in-distance: 20px;
+  --space-slide-out-distance: 40px;
+}

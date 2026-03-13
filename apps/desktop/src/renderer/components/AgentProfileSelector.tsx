@@ -28,9 +28,15 @@ import {
   DEFAULT_PHASE_MODELS,
   DEFAULT_PHASE_THINKING,
 } from '../../shared/constants';
+import { PROVIDER_REGISTRY } from '../../shared/constants/providers';
 import type { ModelType, ThinkingLevel } from '../../shared/types';
 import type { PhaseModelConfig, PhaseThinkingConfig } from '../../shared/types/settings';
+import type { BuiltinProvider } from '../../shared/types/provider-account';
+import { useSettingsStore } from '../stores/settings-store';
 import { cn } from '../lib/utils';
+
+/** Per-phase provider mapping */
+export type PhaseProviderConfig = Record<keyof PhaseModelConfig, BuiltinProvider>;
 
 interface AgentProfileSelectorProps {
   /** Currently selected profile ID ('auto', 'complex', 'balanced', 'quick', or 'custom') */
@@ -53,6 +59,10 @@ interface AgentProfileSelectorProps {
   onPhaseModelsChange?: (phaseModels: PhaseModelConfig) => void;
   /** Called when phase thinking changes (in auto mode) */
   onPhaseThinkingChange?: (phaseThinking: PhaseThinkingConfig) => void;
+  /** Per-phase provider configuration (for mixed provider mode) */
+  phaseProviders?: PhaseProviderConfig;
+  /** Called when phase provider changes */
+  onPhaseProvidersChange?: (providers: PhaseProviderConfig) => void;
   /** Whether the selector is disabled */
   disabled?: boolean;
 }
@@ -83,6 +93,8 @@ export function AgentProfileSelector({
   onThinkingLevelChange,
   onPhaseModelsChange,
   onPhaseThinkingChange,
+  phaseProviders,
+  onPhaseProvidersChange,
   disabled
 }: AgentProfileSelectorProps) {
   const { t } = useTranslation('settings');
@@ -123,6 +135,42 @@ export function AgentProfileSelector({
   // Use provided phase configs or defaults
   const currentPhaseModels = phaseModels || DEFAULT_PHASE_MODELS;
   const currentPhaseThinking = phaseThinking || DEFAULT_PHASE_THINKING;
+
+  // Available providers (those with configured accounts + active provider)
+  const providerAccounts = useSettingsStore(s => s.providerAccounts);
+  const availableProviders = useMemo(() => {
+    const configured = new Set(providerAccounts.map(a => a.provider));
+    configured.add(activeProvider || 'anthropic');
+    return PROVIDER_REGISTRY.filter(p => configured.has(p.id) && ALL_AVAILABLE_MODELS.some(m => m.provider === p.id));
+  }, [providerAccounts, activeProvider]);
+
+  const defaultProvider = (activeProvider || 'anthropic') as BuiltinProvider;
+  const currentPhaseProviders: PhaseProviderConfig = phaseProviders || {
+    spec: defaultProvider, planning: defaultProvider, coding: defaultProvider, qa: defaultProvider
+  };
+
+  // Get models for a specific provider
+  const getModelsForProvider = useCallback((provider: BuiltinProvider) => {
+    if (!provider || provider === 'anthropic') {
+      return AVAILABLE_MODELS.map(m => ({ value: m.value, label: m.label }));
+    }
+    if (provider === 'ollama' && ollamaModels.length > 0) return ollamaModels;
+    const models = ALL_AVAILABLE_MODELS.filter(m => m.provider === provider);
+    return models.length > 0
+      ? models.map(m => ({ value: m.value, label: m.label }))
+      : AVAILABLE_MODELS.map(m => ({ value: m.value, label: m.label }));
+  }, [ollamaModels]);
+
+  const handlePhaseProviderChange = (phase: keyof PhaseModelConfig, newProvider: BuiltinProvider) => {
+    if (onPhaseProvidersChange) {
+      onPhaseProvidersChange({ ...currentPhaseProviders, [phase]: newProvider });
+    }
+    // Auto-set model to first available for new provider
+    const models = getModelsForProvider(newProvider);
+    if (models.length > 0 && onPhaseModelsChange) {
+      onPhaseModelsChange({ ...currentPhaseModels, [phase]: models[0].value as ModelType });
+    }
+  };
 
   // Build model options filtered to the active provider (falls back to Anthropic models)
   const phaseModelOptions = useMemo(() => {
@@ -298,13 +346,19 @@ export function AgentProfileSelector({
             <div className="px-4 pb-4 -mt-1">
               <div className="grid grid-cols-2 gap-2 text-xs">
                 {(Object.keys(PHASE_LABEL_KEYS) as Array<keyof PhaseModelConfig>).map((phase) => {
-                  const modelLabel = activeProvider
-                    ? getProviderModelLabel(currentPhaseModels[phase], activeProvider)
-                    : (AVAILABLE_MODELS.find(m => m.value === currentPhaseModels[phase])?.label?.replace('Claude ', '') || currentPhaseModels[phase]);
+                  const phaseProvider = currentPhaseProviders[phase];
+                  const providerPrefix = phaseProvider !== defaultProvider
+                    ? (PROVIDER_REGISTRY.find(p => p.id === phaseProvider)?.name ?? phaseProvider) + ': '
+                    : '';
+                  const modelLabel = phaseProvider === 'anthropic' || !phaseProvider
+                    ? (activeProvider
+                      ? getProviderModelLabel(currentPhaseModels[phase], activeProvider)
+                      : (AVAILABLE_MODELS.find(m => m.value === currentPhaseModels[phase])?.label?.replace('Claude ', '') || currentPhaseModels[phase]))
+                    : (ALL_AVAILABLE_MODELS.find(m => m.value === currentPhaseModels[phase] && m.provider === phaseProvider)?.label || currentPhaseModels[phase]);
                   return (
                     <div key={phase} className="flex items-center justify-between rounded bg-background/50 px-2 py-1">
                       <span className="text-muted-foreground">{t(PHASE_LABEL_KEYS[phase].label)}:</span>
-                      <span className="font-medium">{modelLabel}</span>
+                      <span className="font-medium truncate ml-1">{providerPrefix}{modelLabel}</span>
                     </div>
                   );
                 })}
@@ -325,7 +379,26 @@ export function AgentProfileSelector({
                       {t(PHASE_LABEL_KEYS[phase].description)}
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-[10px] text-muted-foreground">Provider</Label>
+                      <Select
+                        value={currentPhaseProviders[phase]}
+                        onValueChange={(v) => handlePhaseProviderChange(phase, v as BuiltinProvider)}
+                        disabled={disabled}
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableProviders.map((p) => (
+                            <SelectItem key={p.id} value={p.id}>
+                              {p.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <div className="space-y-1">
                       <Label className="text-[10px] text-muted-foreground">{t('agentProfile.model')}</Label>
                       <Select
@@ -337,7 +410,7 @@ export function AgentProfileSelector({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {phaseModelOptions.map((m) => (
+                          {getModelsForProvider(currentPhaseProviders[phase]).map((m) => (
                             <SelectItem key={m.value} value={m.value}>
                               {m.label}
                             </SelectItem>
@@ -349,7 +422,7 @@ export function AgentProfileSelector({
                       value={currentPhaseThinking[phase]}
                       onChange={(value) => handlePhaseThinkingChange(phase, value as ThinkingLevel)}
                       modelValue={currentPhaseModels[phase]}
-                      provider={activeProvider ?? 'anthropic'}
+                      provider={currentPhaseProviders[phase] || activeProvider || 'anthropic'}
                       disabled={disabled}
                     />
                   </div>

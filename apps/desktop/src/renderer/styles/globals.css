@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Material Design System - Skeuomorphic tokens */
+@import "../design-system/index.css";
+
 @plugin "@tailwindcss/typography";
 
 /* Auto-Build UI Design System - Oscura Midnight Theme */
@@ -1025,6 +1028,275 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.8);
   --shadow-focus: 0 0 0 3px rgba(74, 222, 128, 0.3);
+}
+
+/* ============================================
+   EMERALD THEME (Light)
+   Clean white with modern emerald green
+   ============================================ */
+[data-theme="emerald"] {
+  /* Backgrounds */
+  --background: #FAFAF9;
+  --foreground: #09090B;
+
+  /* Card surfaces */
+  --card: #FFFFFF;
+  --card-foreground: #09090B;
+
+  /* Primary accent - emerald green */
+  --primary: #059669;
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary */
+  --secondary: #F0FDF4;
+  --secondary-foreground: #09090B;
+
+  /* Muted */
+  --muted: #F4F4F5;
+  --muted-foreground: #71717A;
+
+  /* Accent */
+  --accent: #ECFDF5;
+  --accent-foreground: #059669;
+
+  /* Destructive */
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+
+  /* Borders and inputs */
+  --border: #E4E4E7;
+  --input: #E4E4E7;
+  --ring: #059669;
+
+  /* Sidebar */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #09090B;
+
+  /* Popover */
+  --popover: #FFFFFF;
+  --popover-foreground: #09090B;
+
+  /* Semantic colors - green variants */
+  --success: #10B981;
+  --success-foreground: #FFFFFF;
+  --success-light: #D1FAE5;
+  --warning: #CA8A04;
+  --warning-foreground: #FFFFFF;
+  --warning-light: #FEF9C3;
+  --info: #0D9488;
+  --info-foreground: #FFFFFF;
+  --info-light: #CCFBF1;
+  --error: #DC2626;
+  --error-light: #FEE2E2;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.07), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  --shadow-focus: 0 0 0 3px rgba(5, 150, 105, 0.2);
+}
+
+/* ============================================
+   EMERALD THEME (Dark)
+   True black with vibrant emerald accents
+   ============================================ */
+[data-theme="emerald"].dark {
+  /* Backgrounds - true black */
+  --background: #09090B;
+  --foreground: #E4E4E7;
+
+  /* Card surfaces - barely visible elevation */
+  --card: #111113;
+  --card-foreground: #E4E4E7;
+
+  /* Primary accent - vibrant emerald */
+  --primary: #10B981;
+  --primary-foreground: #09090B;
+
+  /* Secondary */
+  --secondary: #18181B;
+  --secondary-foreground: #E4E4E7;
+
+  /* Muted */
+  --muted: #18181B;
+  --muted-foreground: #71717A;
+
+  /* Accent - dark green tint */
+  --accent: #132A1F;
+  --accent-foreground: #10B981;
+
+  /* Destructive */
+  --destructive: #EF4444;
+  --destructive-foreground: #09090B;
+
+  /* Borders and inputs */
+  --border: #1C1C20;
+  --input: #1C1C20;
+  --ring: #10B981;
+
+  /* Sidebar */
+  --sidebar: #0C0C0E;
+  --sidebar-foreground: #E4E4E7;
+
+  /* Popover */
+  --popover: #141416;
+  --popover-foreground: #E4E4E7;
+
+  /* Semantic colors - green-accented */
+  --success: #34D399;
+  --success-foreground: #09090B;
+  --success-light: #0D2818;
+  --warning: #EAB308;
+  --warning-foreground: #09090B;
+  --warning-light: #332D0A;
+  --info: #14B8A6;
+  --info-foreground: #09090B;
+  --info-light: #0A2520;
+  --error: #EF4444;
+  --error-light: #2A0A0A;
+
+  /* Shadows - subtle with emerald glow hint */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 10px 20px -4px rgba(0, 0, 0, 0.4), 0 4px 8px -4px rgba(0, 0, 0, 0.25);
+  --shadow-xl: 0 20px 30px -8px rgba(0, 0, 0, 0.45), 0 8px 12px -6px rgba(0, 0, 0, 0.25);
+  --shadow-focus: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+/* ============================================
+   MATERIAL DARKER THEME (Light)
+   Warm cream with deep orange accents
+   ============================================ */
+[data-theme="material-darker"] {
+  /* Backgrounds */
+  --background: #FFF8F0;
+  --foreground: #1A1210;
+
+  /* Card surfaces */
+  --card: #FFFFFF;
+  --card-foreground: #1A1210;
+
+  /* Primary accent - deep orange */
+  --primary: #E65100;
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary */
+  --secondary: #FFF3E0;
+  --secondary-foreground: #1A1210;
+
+  /* Muted */
+  --muted: #F5F0EB;
+  --muted-foreground: #78716C;
+
+  /* Accent */
+  --accent: #FFF3E0;
+  --accent-foreground: #E65100;
+
+  /* Destructive */
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+
+  /* Borders and inputs */
+  --border: #E7E0D8;
+  --input: #E7E0D8;
+  --ring: #E65100;
+
+  /* Sidebar */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1A1210;
+
+  /* Popover */
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1210;
+
+  /* Semantic colors */
+  --success: #2E7D32;
+  --success-foreground: #FFFFFF;
+  --success-light: #E8F5E9;
+  --warning: #F57F17;
+  --warning-foreground: #FFFFFF;
+  --warning-light: #FFF8E1;
+  --info: #0277BD;
+  --info-foreground: #FFFFFF;
+  --info-light: #E1F5FE;
+  --error: #C62828;
+  --error-light: #FFEBEE;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  --shadow-focus: 0 0 0 3px rgba(230, 81, 0, 0.2);
+}
+
+/* ============================================
+   MATERIAL DARKER THEME (Dark)
+   Warm black with vibrant orange accents
+   Inspired by Material Theme Darker
+   ============================================ */
+[data-theme="material-darker"].dark {
+  /* Backgrounds — warm very-dark with real elevation spread */
+  --background: #0D0D0D;
+  --foreground: #D5CFC8;
+
+  /* Card surfaces — visible warm lift from background */
+  --card: #1B1A19;
+  --card-foreground: #D5CFC8;
+
+  /* Primary accent — vibrant orange */
+  --primary: #FF6D00;
+  --primary-foreground: #0D0D0D;
+
+  /* Secondary — functional surface */
+  --secondary: #1C1916;
+  --secondary-foreground: #D5CFC8;
+
+  /* Muted — warm neutral surface */
+  --muted: #1C1916;
+  --muted-foreground: #B0A89F;
+
+  /* Accent — warm tinted surface, visible */
+  --accent: #1E1508;
+  --accent-foreground: #FF8F00;
+
+  /* Destructive */
+  --destructive: #EF5350;
+  --destructive-foreground: #FFFFFF;
+
+  /* Borders and inputs — warm, visible separation */
+  --border: #2A2420;
+  --input: #2A2420;
+  --ring: #FF6D00;
+
+  /* Sidebar — subtle distinction from main bg */
+  --sidebar: #0A0A0A;
+  --sidebar-foreground: #D5CFC8;
+
+  /* Popover — elevated, matches card */
+  --popover: #1B1A19;
+  --popover-foreground: #D5CFC8;
+
+  /* Semantic colors — Material palette */
+  --success: #66BB6A;
+  --success-foreground: #0D0D0D;
+  --success-light: #0C180C;
+  --warning: #FFA726;
+  --warning-foreground: #0D0D0D;
+  --warning-light: #18130A;
+  --info: #42A5F5;
+  --info-foreground: #0D0D0D;
+  --info-light: #0A1420;
+  --error: #EF5350;
+  --error-light: #180A0A;
+
+  /* Shadows — deep with warm diffusion */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 20px -4px rgba(0, 0, 0, 0.7), 0 4px 8px -4px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 30px -8px rgba(0, 0, 0, 0.8), 0 8px 12px -6px rgba(0, 0, 0, 0.4);
+  --shadow-focus: 0 0 0 3px rgba(255, 109, 0, 0.3);
 }
 
 /* Base styles */

@@ -1,0 +1,357 @@
+/*
+ * Design System Foundation - Main Integration File
+ *
+ * This file coordinates all design system tokens and integrates them with
+ * the existing theme system of the Auto-Claude application.
+ */
+
+/* Import all design system token files */
+@import './tokens/materials.css';
+@import './tokens/elevation.css';
+@import './tokens/motion.css';
+@import './tokens/spacing.css';
+@import './tokens/typography.css';
+@import './tokens/radius.css';
+@import './utils/materials.css';
+
+/* ========================================
+ * EXISTING THEME SYSTEM INTEGRATION
+ * ======================================== */
+
+:root {
+  /* Integration layer - Maps existing theme variables to material tokens */
+  /* This ensures backward compatibility while introducing material concepts */
+
+  /* Primary theme color mappings to wood materials */
+  --theme-wood-primary: var(--material-wood-walnut);
+  --theme-wood-primary-hover: var(--material-wood-walnut-highlight);
+  --theme-wood-primary-active: var(--material-wood-walnut-shadow);
+
+  /* Secondary theme color mappings to metal materials */
+  --theme-metal-primary: var(--material-metal-steel);
+  --theme-metal-primary-hover: var(--material-metal-steel-highlight);
+  --theme-metal-primary-active: var(--material-metal-steel-shadow);
+
+  /* Background theme mappings to paper materials */
+  --theme-paper-primary: var(--material-paper-white);
+  --theme-paper-secondary: var(--material-paper-cream);
+  --theme-paper-tertiary: var(--material-paper-aged);
+
+  /* Overlay theme mappings to glass materials */
+  --theme-glass-overlay: var(--material-glass-clear);
+  --theme-glass-modal: var(--material-glass-frosted);
+  --theme-glass-subtle: var(--material-glass-tinted);
+}
+
+/* ========================================
+ * THEME-SPECIFIC MATERIAL ADAPTATIONS
+ * ======================================== */
+
+/* Default theme - Natural, warm materials */
+[data-theme="default"] {
+  --material-wood-walnut: #8B4513;
+  --material-wood-walnut-highlight: #A0522D;
+  --material-wood-walnut-shadow: #654321;
+  --material-metal-steel: #D4D4D4;
+  --material-metal-steel-highlight: #E8E8E8;
+  --material-metal-steel-shadow: #B8B8B8;
+  --material-paper-white: #FEFCF8;
+  --material-paper-cream: #FAF7F2;
+  --material-paper-aged: #F5F2EA;
+}
+
+/* Dusk theme - Warmer, softer materials */
+[data-theme="dusk"] {
+  --material-wood-walnut: #A0522D;
+  --material-wood-walnut-highlight: #CD853F;
+  --material-wood-walnut-shadow: #8B4513;
+  --material-metal-steel: #F5DEB3;
+  --material-metal-steel-highlight: #FFF8DC;
+  --material-metal-steel-shadow: #DEB887;
+  --material-paper-white: #FFF8DC;
+  --material-paper-cream: #FFFACD;
+  --material-paper-aged: #F5F5DC;
+}
+
+/* Ocean theme - Cool, flowing materials */
+[data-theme="ocean"] {
+  --material-wood-walnut: #4682B4;
+  --material-wood-walnut-highlight: #87CEEB;
+  --material-wood-walnut-shadow: #2F4F4F;
+  --material-metal-steel: #B0E0E6;
+  --material-metal-steel-highlight: #E0F6FF;
+  --material-metal-steel-shadow: #87CEEB;
+  --material-paper-white: #F0F8FF;
+  --material-paper-cream: #F8F8FF;
+  --material-paper-aged: #E6F3FF;
+}
+
+/* Lime theme - Energetic, vibrant materials */
+[data-theme="lime"] {
+  --material-wood-walnut: #9ACD32;
+  --material-wood-walnut-highlight: #ADFF2F;
+  --material-wood-walnut-shadow: #808000;
+  --material-metal-steel: #F0F8FF;
+  --material-metal-steel-highlight: #F8F8FF;
+  --material-metal-steel-shadow: #E0E6FF;
+  --material-paper-white: #F5FFFA;
+  --material-paper-cream: #F0FFF0;
+  --material-paper-aged: #E6FFED;
+}
+
+/* Retro theme - Vintage, nostalgic materials */
+[data-theme="retro"] {
+  --material-wood-walnut: #D2691E;
+  --material-wood-walnut-highlight: #F4A460;
+  --material-wood-walnut-shadow: #A0522D;
+  --material-metal-steel: #DDD0C0;
+  --material-metal-steel-highlight: #F5DEB3;
+  --material-metal-steel-shadow: #D2B48C;
+  --material-paper-white: #FDF5E6;
+  --material-paper-cream: #FFFAF0;
+  --material-paper-aged: #F5F0E8;
+}
+
+/* Neo theme - High-tech, modern materials */
+[data-theme="neo"] {
+  --material-wood-walnut: #FF6347;
+  --material-wood-walnut-highlight: #FF7F50;
+  --material-wood-walnut-shadow: #CD5C5C;
+  --material-metal-steel: #36454F;
+  --material-metal-steel-highlight: #708090;
+  --material-metal-steel-shadow: #2F4F4F;
+  --material-paper-white: #1C1C1C;
+  --material-paper-cream: #2F2F2F;
+  --material-paper-aged: #404040;
+}
+
+/* Forest theme - Natural, earthy materials */
+[data-theme="forest"] {
+  --material-wood-walnut: #228B22;
+  --material-wood-walnut-highlight: #32CD32;
+  --material-wood-walnut-shadow: #006400;
+  --material-metal-steel: #F5F5DC;
+  --material-metal-steel-highlight: #FFFACD;
+  --material-metal-steel-shadow: #EEE8AA;
+  --material-paper-white: #F0FFF0;
+  --material-paper-cream: #HONEYDEW;
+  --material-paper-aged: #E6F5E6;
+}
+
+/* ========================================
+ * COMPONENT SYSTEM INTEGRATION
+ * ======================================== */
+
+/* Base classes for component development */
+.design-system-component {
+  /* Enable material system by default */
+  --component-uses-materials: true;
+
+  /* Transition support for all interactive states */
+  transition-property: transform, box-shadow, background, border-color, opacity;
+  transition-timing-function: var(--easing-material-standard);
+  transition-duration: var(--duration-normal);
+
+  /* Hardware acceleration for smooth interactions */
+  transform: var(--gpu-acceleration);
+  will-change: transform;
+}
+
+/* Material hierarchy enforcement classes */
+.primary-action-material {
+  /* Wood materials for primary actions (10% usage) */
+  background: var(--texture-wood-grain), var(--material-wood-walnut);
+  color: white;
+  border-radius: var(--radius-material-natural);
+  box-shadow: var(--elevation-wood-button);
+  font-weight: var(--typography-wood-body-weight);
+  text-shadow: var(--typography-wood-text-shadow);
+}
+
+.secondary-action-material {
+  /* Metal materials for secondary actions (25% usage) */
+  background: var(--texture-metal-brushed), var(--material-metal-steel);
+  color: var(--material-wood-walnut);
+  border-radius: var(--radius-material-subtle);
+  box-shadow: var(--elevation-metal-control);
+  font-weight: var(--typography-metal-body-weight);
+  text-shadow: var(--typography-metal-text-shadow);
+}
+
+.content-surface-material {
+  /* Paper materials for content surfaces (60% usage) */
+  background: var(--texture-paper-fiber), var(--material-paper-white);
+  color: var(--material-wood-walnut);
+  border-radius: var(--radius-material-soft);
+  box-shadow: var(--elevation-paper-card);
+  font-weight: var(--typography-paper-body-weight);
+}
+
+.overlay-surface-material {
+  /* Glass materials for overlays (4% usage) */
+  background: var(--material-glass-clear);
+  backdrop-filter: var(--material-glass-clear-blur);
+  border: 2px solid var(--material-glass-clear-border);
+  color: var(--material-wood-walnut);
+  border-radius: var(--radius-material-soft);
+  box-shadow: var(--elevation-glass-modal);
+  font-weight: var(--typography-glass-overlay-weight);
+  text-shadow: var(--typography-glass-text-shadow);
+}
+
+.background-material {
+  /* Fabric materials for backgrounds (1% usage) */
+  background: var(--texture-fabric-linen), var(--material-fabric-linen);
+  color: var(--material-wood-walnut);
+  font-weight: var(--typography-paper-body-weight);
+}
+
+/* ========================================
+ * ACCESSIBILITY ENHANCEMENTS
+ * ======================================== */
+
+/* High contrast mode adaptations */
+@media (prefers-contrast: high) {
+  .design-system-component {
+    /* Increase border contrast */
+    border-width: 2px;
+    border-color: currentColor;
+  }
+
+  .interactive-base:focus-visible {
+    /* Enhanced focus visibility */
+    outline-width: 4px;
+    outline-offset: 2px;
+  }
+
+  /* Disable subtle textures that may reduce contrast */
+  .material-base {
+    background: var(--material-base-color) !important;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .design-system-component {
+    transition: opacity var(--duration-fast) ease-out;
+  }
+
+  .interactive-base:hover {
+    transform: none;
+    opacity: 0.9;
+  }
+
+  .interactive-base:active {
+    transform: none;
+    opacity: 0.8;
+  }
+
+  /* Disable complex animations */
+  .animate-entrance,
+  .animate-exit,
+  .animate-shimmer,
+  .animate-pulse,
+  .animate-glow {
+    animation: none;
+  }
+}
+
+/* ========================================
+ * PERFORMANCE OPTIMIZATIONS
+ * ======================================== */
+
+/* GPU acceleration hints for interactive elements */
+.interactive-base,
+.design-system-component {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Limit will-change to actively animating elements */
+.interactive-base:hover,
+.interactive-base:active,
+.interactive-base:focus {
+  will-change: transform, box-shadow;
+}
+
+.interactive-base:not(:hover):not(:active):not(:focus) {
+  will-change: auto;
+}
+
+/* ========================================
+ * COMPONENT USAGE HELPERS
+ * ======================================== */
+
+/* Debug helpers for development */
+.debug-material-boundaries {
+  outline: 1px dashed red;
+  outline-offset: 1px;
+}
+
+.debug-material-boundaries::before {
+  content: attr(class);
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-size: 10px;
+  color: red;
+  background: white;
+  padding: 2px 4px;
+  font-family: monospace;
+  z-index: 9999;
+}
+
+/* Performance budget warnings */
+.performance-warning {
+  /* Use this class to identify components that may exceed performance budgets */
+  border: 2px solid orange !important;
+}
+
+.performance-warning::after {
+  content: "⚠️ Performance Check Required";
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: orange;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 10000;
+}
+
+/* ========================================
+ * DESIGN SYSTEM VALIDATION
+ * ======================================== */
+
+/* Ensure critical design system variables are available */
+:root {
+  /* Validation tokens - These should always be defined */
+  --design-system-version: "1.0.0";
+  --design-system-loaded: true;
+
+  /* Component count validation */
+  --design-system-material-count: 5; /* paper, metal, wood, glass, fabric */
+  --design-system-elevation-count: 13; /* 0-12 elevation levels */
+  --design-system-motion-count: 6; /* duration scale */
+
+  /* Performance validation */
+  --design-system-max-gradients: 3;
+  --design-system-max-shadows: 3;
+  --design-system-max-animation-duration: 750; /* ms */
+}
+
+/* Error state for missing design system */
+.design-system-error {
+  background: red !important;
+  color: white !important;
+  padding: 8px !important;
+}
+
+.design-system-error::before {
+  content: "❌ Design System Error: Missing required tokens";
+  display: block;
+  font-weight: bold;
+  margin-bottom: 4px;
+}

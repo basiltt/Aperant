@@ -1,0 +1,457 @@
+/*
+ * Motion & Interaction Design Tokens - Skeuomorphic Design System
+ *
+ * Physics-based animation and interaction tokens for creating realistic
+ * material behavior and smooth user feedback patterns.
+ */
+
+:root {
+  /* ========================================
+   * ANIMATION DURATION SCALE
+   * ======================================== */
+
+  /* Base duration scale (following 60fps timing) */
+  --duration-instant: 0ms;
+  --duration-fast: 100ms;      /* Quick feedback (6 frames) */
+  --duration-normal: 200ms;    /* Standard interactions (12 frames) */
+  --duration-slow: 300ms;      /* Complex transitions (18 frames) */
+  --duration-deliberate: 500ms; /* Intentional animations (30 frames) */
+  --duration-extended: 750ms;  /* Extended sequences (45 frames) */
+
+  /* ========================================
+   * MATERIAL-SPECIFIC DURATIONS
+   * ======================================== */
+
+  /* Paper materials - Medium natural speed */
+  --duration-paper-transition: var(--duration-normal);
+  --duration-paper-fold: var(--duration-slow);
+  --duration-paper-unfold: var(--duration-slow);
+
+  /* Metal materials - Crisp, fast responses */
+  --duration-metal-transition: var(--duration-fast);
+  --duration-metal-click: var(--duration-fast);
+  --duration-metal-resonate: var(--duration-normal);
+
+  /* Wood materials - Slower, organic feel */
+  --duration-wood-transition: var(--duration-slow);
+  --duration-wood-press: var(--duration-normal);
+  --duration-wood-settle: var(--duration-deliberate);
+
+  /* Glass materials - Smooth, floating transitions */
+  --duration-glass-transition: var(--duration-normal);
+  --duration-glass-float: var(--duration-slow);
+  --duration-glass-shimmer: var(--duration-deliberate);
+
+  /* Fabric materials - Soft, gradual changes */
+  --duration-fabric-transition: var(--duration-slow);
+  --duration-fabric-compress: var(--duration-normal);
+  --duration-fabric-relax: var(--duration-deliberate);
+
+  /* ========================================
+   * EASING FUNCTIONS
+   * ======================================== */
+
+  /* Standard CSS easing curves */
+  --easing-linear: linear;
+  --easing-ease: ease;
+  --easing-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --easing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --easing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Material Design standard curves */
+  --easing-material-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-material-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --easing-material-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --easing-material-sharp: cubic-bezier(0.4, 0, 0.6, 1);
+
+  /* Physical material easing curves */
+  --easing-paper-fold: cubic-bezier(0.2, 0, 0.1, 1);
+  --easing-paper-unfold: cubic-bezier(0.1, 0, 0.3, 1);
+  --easing-metal-click: cubic-bezier(0.6, 0, 0.4, 1);
+  --easing-metal-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --easing-wood-press: cubic-bezier(0.3, 0, 0.1, 1);
+  --easing-wood-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --easing-glass-float: cubic-bezier(0.1, 0, 0.3, 1);
+  --easing-glass-settle: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --easing-fabric-soft: cubic-bezier(0.23, 1, 0.32, 1);
+  --easing-fabric-compress: cubic-bezier(0.39, 0.575, 0.565, 1);
+
+  /* ========================================
+   * INTERACTION STATE TIMING
+   * ======================================== */
+
+  /* Hover state timing */
+  --timing-hover-enter: var(--duration-normal) var(--easing-material-decelerate);
+  --timing-hover-exit: var(--duration-fast) var(--easing-material-accelerate);
+
+  /* Focus state timing */
+  --timing-focus-enter: var(--duration-fast) var(--easing-material-standard);
+  --timing-focus-exit: var(--duration-normal) var(--easing-material-decelerate);
+
+  /* Active/Press state timing */
+  --timing-active-enter: var(--duration-fast) var(--easing-material-sharp);
+  --timing-active-exit: var(--duration-normal) var(--easing-material-decelerate);
+
+  /* Disabled state timing */
+  --timing-disabled-enter: var(--duration-slow) var(--easing-material-decelerate);
+  --timing-disabled-exit: var(--duration-normal) var(--easing-material-standard);
+
+  /* ========================================
+   * TRANSFORM PATTERNS
+   * ======================================== */
+
+  /* Hover transforms */
+  --transform-hover-subtle: translate3d(0, -1px, 0);
+  --transform-hover-moderate: translate3d(0, -2px, 0);
+  --transform-hover-prominent: translate3d(0, -3px, 0);
+
+  /* Active/Press transforms */
+  --transform-pressed-subtle: translate3d(0, 1px, 0) scale(0.99);
+  --transform-pressed-moderate: translate3d(0, 2px, 0) scale(0.98);
+  --transform-pressed-deep: translate3d(0, 3px, 0) scale(0.97);
+
+  /* Material-specific transforms */
+  --transform-paper-curl: rotate(0.5deg) scale(1.01);
+  --transform-metal-reflect: scale(1.01) rotateX(1deg);
+  --transform-wood-settle: scale(0.98) rotate(-0.2deg);
+  --transform-glass-float: scale(1.02) translate3d(0, -2px, 0);
+  --transform-fabric-compress: scale(0.995) translate3d(0, 1px, 0);
+
+  /* ========================================
+   * ENTRANCE & EXIT ANIMATIONS
+   * ======================================== */
+
+  /* Modal/Overlay entrance patterns */
+  --entrance-modal-backdrop: fadeIn var(--duration-normal) var(--easing-material-decelerate);
+  --entrance-modal-content: slideInScale var(--duration-slow) var(--easing-material-standard);
+  --entrance-tooltip: slideInFade var(--duration-normal) var(--easing-material-decelerate);
+  --entrance-dropdown: dropdownSlide var(--duration-normal) var(--easing-glass-float);
+
+  /* Toast/Notification entrance patterns */
+  --entrance-toast-right: slideInRight var(--duration-normal) var(--easing-glass-float);
+  --entrance-toast-top: slideInTop var(--duration-normal) var(--easing-material-decelerate);
+  --entrance-toast-bottom: slideInBottom var(--duration-normal) var(--easing-material-decelerate);
+
+  /* Exit patterns */
+  --exit-modal: fadeOut var(--duration-fast) var(--easing-material-accelerate);
+  --exit-toast: slideOutRight var(--duration-normal) var(--easing-material-accelerate);
+  --exit-dropdown: slideOutFade var(--duration-fast) var(--easing-material-accelerate);
+
+  /* ========================================
+   * LOADING & PROGRESS ANIMATIONS
+   * ======================================== */
+
+  /* Shimmer effects */
+  --animation-shimmer-paper: shimmerPaper 2s infinite var(--easing-material-standard);
+  --animation-pulse-metal: pulseMetal 1.5s infinite var(--easing-material-standard);
+  --animation-glow-wood: glowWood 2.5s infinite var(--easing-wood-spring);
+
+  /* Progress indicators */
+  --animation-progress-fill: progressFill var(--duration-slow) var(--easing-wood-press);
+  --animation-spinner-glass: spinnerGlass 1s linear infinite;
+
+  /* ========================================
+   * MICRO-INTERACTION PATTERNS
+   * ======================================== */
+
+  /* Button press sequence */
+  --sequence-button-press: var(--timing-active-enter);
+  --sequence-button-release: var(--timing-active-exit);
+
+  /* Input focus sequence */
+  --sequence-input-focus-metal: var(--timing-focus-enter);
+  --sequence-input-focus-paper: var(--duration-normal) var(--easing-paper-unfold);
+
+  /* Card hover sequence */
+  --sequence-card-lift: var(--duration-paper-transition) var(--easing-paper-fold);
+  --sequence-card-settle: var(--timing-hover-exit);
+
+  /* Navigation transition sequence */
+  --sequence-nav-metal-activate: var(--duration-metal-click) var(--easing-metal-click);
+  --sequence-nav-paper-inset: var(--duration-normal) var(--easing-paper-fold);
+
+  /* ========================================
+   * RESPONSIVE ANIMATION ADJUSTMENTS
+   * ======================================== */
+
+  /* Mobile: Simplified and faster animations */
+  --duration-mobile-fast: var(--duration-fast);
+  --duration-mobile-normal: calc(var(--duration-normal) * 0.8);
+  --duration-mobile-slow: calc(var(--duration-slow) * 0.7);
+
+  /* Reduced motion preferences */
+  --duration-reduced-motion: var(--duration-fast);
+  --easing-reduced-motion: var(--easing-linear);
+  --transform-reduced-motion: none;
+
+  /* High contrast mode adjustments */
+  --duration-high-contrast: var(--duration-normal);
+  --easing-high-contrast: var(--easing-material-standard);
+
+  /* ========================================
+   * STAGGER & SEQUENCE TIMING
+   * ======================================== */
+
+  /* List item stagger delays */
+  --stagger-delay-1: 0ms;
+  --stagger-delay-2: 50ms;
+  --stagger-delay-3: 100ms;
+  --stagger-delay-4: 150ms;
+  --stagger-delay-5: 200ms;
+
+  /* Sequence step delays */
+  --sequence-step-1: 0ms;
+  --sequence-step-2: calc(var(--duration-fast) + 50ms);
+  --sequence-step-3: calc(var(--duration-normal) + 100ms);
+
+  /* ========================================
+   * PERFORMANCE CONSTRAINTS
+   * ======================================== */
+
+  /* Maximum animation complexity (enforced by build tools) */
+  --max-simultaneous-animations: 3;
+  --max-animation-duration: var(--duration-extended);
+  --performance-animation-properties: transform, opacity, filter;
+
+  /* GPU acceleration hints */
+  --gpu-acceleration: translate3d(0, 0, 0);
+  --will-change-transform: transform;
+  --will-change-opacity: opacity;
+  --will-change-filter: filter;
+}
+
+/* ========================================
+ * ANIMATION KEYFRAMES
+ * ======================================== */
+
+/* Entrance animations */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideInScale {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -60%, 0) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInFade {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes dropdownSlide {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Exit animations */
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes slideOutRight {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+/* Loading animations */
+@keyframes shimmerPaper {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulseMetal {
+  0%, 100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.7;
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes glowWood {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.1) drop-shadow(0 0 8px rgba(139, 69, 19, 0.3)); }
+}
+
+@keyframes progressFill {
+  0% { width: 0%; }
+  100% { width: var(--progress-value, 100%); }
+}
+
+@keyframes spinnerGlass {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ========================================
+ * UTILITY CLASSES
+ * ======================================== */
+
+/* Animation control classes */
+.animate-entrance { animation: var(--entrance-modal-content); }
+.animate-exit { animation: var(--exit-modal); }
+.animate-shimmer { animation: var(--animation-shimmer-paper); }
+.animate-pulse { animation: var(--animation-pulse-metal); }
+.animate-glow { animation: var(--animation-glow-wood); }
+
+/* Transition utility classes */
+.transition-material {
+  transition: all var(--duration-normal) var(--easing-material-standard);
+}
+
+.transition-paper {
+  transition: all var(--duration-paper-transition) var(--easing-paper-fold);
+}
+
+.transition-metal {
+  transition: all var(--duration-metal-transition) var(--easing-metal-click);
+}
+
+.transition-wood {
+  transition: all var(--duration-wood-transition) var(--easing-wood-press);
+}
+
+.transition-glass {
+  transition: all var(--duration-glass-transition) var(--easing-glass-float);
+}
+
+.transition-fabric {
+  transition: all var(--duration-fabric-transition) var(--easing-fabric-soft);
+}
+
+/* Performance optimization classes */
+.will-change-transform { will-change: var(--will-change-transform); }
+.will-change-opacity { will-change: var(--will-change-opacity); }
+.will-change-filter { will-change: var(--will-change-filter); }
+.gpu-accelerated { transform: var(--gpu-acceleration); }
+
+/* ========================================
+ * RESPONSIVE MOTION QUERIES
+ * ======================================== */
+
+/* Mobile: Simplified animations */
+@media (max-width: 767px) {
+  :root {
+    --duration-normal: var(--duration-mobile-normal);
+    --duration-slow: var(--duration-mobile-slow);
+    --duration-deliberate: var(--duration-normal);
+  }
+
+  /* Simplify transforms for performance */
+  .interactive-element {
+    --transform-hover-subtle: translate3d(0, -1px, 0);
+    --transform-pressed-subtle: translate3d(0, 1px, 0) scale(0.99);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-normal: var(--duration-reduced-motion);
+    --duration-slow: var(--duration-reduced-motion);
+    --duration-deliberate: var(--duration-reduced-motion);
+    --easing-material-standard: var(--easing-reduced-motion);
+    --transform-hover-subtle: var(--transform-reduced-motion);
+    --transform-pressed-subtle: var(--transform-reduced-motion);
+  }
+
+  /* Disable complex animations */
+  .animate-entrance,
+  .animate-exit,
+  .animate-shimmer,
+  .animate-pulse,
+  .animate-glow {
+    animation: none;
+  }
+
+  /* Simple fade alternatives */
+  .animate-entrance { opacity: 1; }
+  .animate-exit { opacity: 0; }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --duration-normal: var(--duration-high-contrast);
+    --easing-material-standard: var(--easing-high-contrast);
+  }
+
+  /* Disable subtle animations that may affect contrast */
+  .animate-shimmer,
+  .animate-glow {
+    animation: none;
+  }
+}
+
+/* ========================================
+ * INTERACTION STATE ANIMATION MIXINS
+ * ======================================== */
+
+/* Universal hover animation */
+.interactive-hover {
+  transition: var(--timing-hover-enter);
+}
+
+.interactive-hover:hover {
+  transform: var(--transform-hover-subtle);
+  transition: var(--timing-hover-exit);
+}
+
+/* Universal active animation */
+.interactive-active {
+  transition: var(--timing-active-enter);
+}
+
+.interactive-active:active {
+  transform: var(--transform-pressed-subtle);
+  transition: var(--timing-active-exit);
+}
+
+/* Universal focus animation */
+.interactive-focus {
+  transition: var(--timing-focus-enter);
+}
+
+.interactive-focus:focus-visible {
+  transition: var(--timing-focus-exit);
+}

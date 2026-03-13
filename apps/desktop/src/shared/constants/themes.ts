@@ -55,5 +55,17 @@ export const COLOR_THEMES: ColorThemeDefinition[] = [
     name: 'Forest',
     description: 'Natural, earthy green tones',
     previewColors: { bg: '#DCFCE7', accent: '#16A34A', darkBg: '#052E16' }
+  },
+  {
+    id: 'emerald',
+    name: 'Emerald',
+    description: 'Deep black with modern emerald green',
+    previewColors: { bg: '#FAFAF9', accent: '#059669', darkBg: '#09090B', darkAccent: '#10B981' }
+  },
+  {
+    id: 'material-darker',
+    name: 'Material Darker',
+    description: 'Warm black with vibrant orange accents',
+    previewColors: { bg: '#FFF8F0', accent: '#E65100', darkBg: '#0D0D0D', darkAccent: '#FF6D00' }
   }
 ];

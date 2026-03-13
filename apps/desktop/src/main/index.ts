@@ -52,6 +52,7 @@ import { registerSettingsAccessor } from './ai/auth/resolver';
 import { appLog, setupErrorLogging } from './app-logger';
 import { initSentryMain } from './sentry';
 import { preWarmToolCache } from './cli-tool-manager';
+import { startProxyInternal } from './ipc-handlers/proxy-handlers';
 import { initializeClaudeProfileManager, getClaudeProfileManager } from './claude-profile-manager';
 import { isProfileAuthenticated } from './claude-profile/profile-utils';
 import { isMacOS, isWindows } from './platform';
@@ -515,6 +516,22 @@ app.whenReady().then(() => {
       console.warn('[main] Failed to pre-warm CLI cache:', error);
     });
   });
+
+  // Auto-start proxy server if enabled in settings
+  {
+    const startupSettings = loadSettingsSync();
+    if (startupSettings.proxyEnabled) {
+      const provider = startupSettings.proxyProvider || 'copilot';
+      console.warn(`[main] Proxy auto-start enabled — starting proxy server with provider: ${provider}`);
+      startProxyInternal(provider).then((result) => {
+        if (result.success) {
+          console.warn('[main] Proxy auto-started successfully, pid:', result.data?.pid);
+        } else {
+          console.warn('[main] Proxy auto-start failed:', result.error);
+        }
+      });
+    }
+  }
 
   // Initialize Claude profile manager, then start usage monitor
   // We do this sequentially to ensure profile data (including auto-switch settings)

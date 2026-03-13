@@ -1,0 +1,223 @@
+/*
+ * Typography Design Tokens - Skeuomorphic Design System
+ *
+ * Material-aware typography system that considers readability and
+ * visual hierarchy across different material surfaces.
+ */
+
+:root {
+  /* ========================================
+   * FONT FAMILY SYSTEM
+   * ======================================== */
+
+  /* Primary font families */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Cascadia Code', monospace;
+  --font-family-display: 'Inter Display', var(--font-family-sans);
+
+  /* Material-specific font family preferences */
+  --font-family-paper: var(--font-family-sans);    /* Clean reading fonts for paper */
+  --font-family-metal: var(--font-family-sans);    /* Technical precision fonts */
+  --font-family-wood: var(--font-family-display);  /* Stronger presence for wood */
+  --font-family-glass: var(--font-family-sans);    /* Light, airy fonts for glass */
+  --font-family-fabric: var(--font-family-sans);   /* Subtle fonts for fabric */
+
+  /* ========================================
+   * FONT SIZE SCALE
+   * ======================================== */
+
+  /* Base font size scale (1.25 ratio for harmonious progression) */
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-base: 1rem;    /* 16px - browser default */
+  --font-size-lg: 1.125rem;  /* 18px */
+  --font-size-xl: 1.25rem;   /* 20px */
+  --font-size-2xl: 1.5rem;   /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem;  /* 36px */
+  --font-size-5xl: 3rem;     /* 48px */
+  --font-size-6xl: 3.75rem;  /* 60px */
+
+  /* Component-specific font sizes */
+  --font-size-button-sm: var(--font-size-sm);
+  --font-size-button-md: var(--font-size-base);
+  --font-size-button-lg: var(--font-size-lg);
+  --font-size-input: var(--font-size-base);
+  --font-size-label: var(--font-size-sm);
+  --font-size-caption: var(--font-size-xs);
+
+  /* ========================================
+   * FONT WEIGHT SYSTEM
+   * ======================================== */
+
+  /* Standard font weight scale */
+  --font-weight-thin: 100;
+  --font-weight-extralight: 200;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* Semantic font weights */
+  --font-weight-body: var(--font-weight-normal);
+  --font-weight-heading: var(--font-weight-semibold);
+  --font-weight-strong: var(--font-weight-bold);
+  --font-weight-subtle: var(--font-weight-light);
+
+  /* ========================================
+   * LINE HEIGHT SYSTEM
+   * ======================================== */
+
+  /* Line height scale for different use cases */
+  --line-height-tight: 1.2;      /* Headings, compact text */
+  --line-height-snug: 1.375;     /* UI text, buttons */
+  --line-height-normal: 1.5;     /* Body text, standard */
+  --line-height-relaxed: 1.625;  /* Long-form reading */
+  --line-height-loose: 2;        /* Spaced-out text */
+
+  /* Component-specific line heights */
+  --line-height-button: var(--line-height-snug);
+  --line-height-input: var(--line-height-normal);
+  --line-height-label: var(--line-height-snug);
+  --line-height-body: var(--line-height-relaxed);
+  --line-height-heading: var(--line-height-tight);
+
+  /* ========================================
+   * LETTER SPACING SYSTEM
+   * ======================================== */
+
+  /* Letter spacing scale */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+
+  /* Component-specific letter spacing */
+  --letter-spacing-button: var(--letter-spacing-wide);
+  --letter-spacing-heading: var(--letter-spacing-tight);
+  --letter-spacing-body: var(--letter-spacing-normal);
+  --letter-spacing-caption: var(--letter-spacing-wide);
+
+  /* ========================================
+   * MATERIAL-SPECIFIC TYPOGRAPHY ADAPTATIONS
+   * ======================================== */
+
+  /* Paper material typography - optimized for reading */
+  --typography-paper-family: var(--font-family-paper);
+  --typography-paper-weight-heading: var(--font-weight-medium);
+  --typography-paper-weight-body: var(--font-weight-normal);
+  --typography-paper-weight-caption: var(--font-weight-normal);
+  --typography-paper-line-height: var(--line-height-relaxed);
+  --typography-paper-letter-spacing: var(--letter-spacing-normal);
+  --typography-paper-text-shadow: none;
+
+  /* Metal material typography - enhanced visibility on textured surfaces */
+  --typography-metal-family: var(--font-family-metal);
+  --typography-metal-weight-heading: var(--font-weight-semibold);
+  --typography-metal-weight-body: var(--font-weight-medium);
+  --typography-metal-weight-caption: var(--font-weight-normal);
+  --typography-metal-line-height: var(--line-height-snug);
+  --typography-metal-letter-spacing: var(--letter-spacing-wide);
+  --typography-metal-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* Wood material typography - warm and prominent */
+  --typography-wood-family: var(--font-family-wood);
+  --typography-wood-weight-heading: var(--font-weight-bold);
+  --typography-wood-weight-body: var(--font-weight-medium);
+  --typography-wood-weight-accent: var(--font-weight-semibold);
+  --typography-wood-line-height: var(--line-height-normal);
+  --typography-wood-letter-spacing: var(--letter-spacing-tight);
+  --typography-wood-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+
+  /* Glass material typography - enhanced contrast for transparency */
+  --typography-glass-family: var(--font-family-glass);
+  --typography-glass-weight-overlay: var(--font-weight-medium);
+  --typography-glass-weight-subtle: var(--font-weight-normal);
+  --typography-glass-line-height: var(--line-height-normal);
+  --typography-glass-letter-spacing: var(--letter-spacing-normal);
+  --typography-glass-text-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+
+  /* Fabric material typography - subtle and understated */
+  --typography-fabric-family: var(--font-family-fabric);
+  --typography-fabric-weight-heading: var(--font-weight-medium);
+  --typography-fabric-weight-body: var(--font-weight-normal);
+  --typography-fabric-line-height: var(--line-height-relaxed);
+  --typography-fabric-letter-spacing: var(--letter-spacing-normal);
+  --typography-fabric-text-shadow: none;
+
+  /* ========================================
+   * TYPOGRAPHY HIERARCHY TOKENS
+   * ======================================== */
+
+  /* Heading hierarchy */
+  --typography-h1: var(--font-weight-bold) var(--font-size-5xl)/var(--line-height-tight) var(--font-family-display);
+  --typography-h2: var(--font-weight-bold) var(--font-size-4xl)/var(--line-height-tight) var(--font-family-display);
+  --typography-h3: var(--font-weight-semibold) var(--font-size-3xl)/var(--line-height-snug) var(--font-family-display);
+  --typography-h4: var(--font-weight-semibold) var(--font-size-2xl)/var(--line-height-snug) var(--font-family-sans);
+  --typography-h5: var(--font-weight-medium) var(--font-size-xl)/var(--line-height-normal) var(--font-family-sans);
+  --typography-h6: var(--font-weight-medium) var(--font-size-lg)/var(--line-height-normal) var(--font-family-sans);
+
+  /* Body text hierarchy */
+  --typography-body-lg: var(--font-weight-normal) var(--font-size-lg)/var(--line-height-relaxed) var(--font-family-sans);
+  --typography-body: var(--font-weight-normal) var(--font-size-base)/var(--line-height-relaxed) var(--font-family-sans);
+  --typography-body-sm: var(--font-weight-normal) var(--font-size-sm)/var(--line-height-normal) var(--font-family-sans);
+
+  /* UI text hierarchy */
+  --typography-button: var(--font-weight-medium) var(--font-size-base)/var(--line-height-snug) var(--font-family-sans);
+  --typography-label: var(--font-weight-medium) var(--font-size-sm)/var(--line-height-snug) var(--font-family-sans);
+  --typography-caption: var(--font-weight-normal) var(--font-size-xs)/var(--line-height-normal) var(--font-family-sans);
+  --typography-code: var(--font-weight-normal) var(--font-size-sm)/var(--line-height-normal) var(--font-family-mono);
+
+  /* ========================================
+   * RESPONSIVE TYPOGRAPHY SCALE
+   * ======================================== */
+
+  /* Mobile: Smaller, more compact typography */
+  --typography-mobile-h1: var(--font-weight-bold) var(--font-size-3xl)/var(--line-height-tight) var(--font-family-display);
+  --typography-mobile-h2: var(--font-weight-bold) var(--font-size-2xl)/var(--line-height-tight) var(--font-family-display);
+  --typography-mobile-h3: var(--font-weight-semibold) var(--font-size-xl)/var(--line-height-snug) var(--font-family-display);
+  --typography-mobile-body: var(--font-weight-normal) var(--font-size-base)/var(--line-height-relaxed) var(--font-family-sans);
+
+  /* Tablet: Medium scale typography */
+  --typography-tablet-h1: var(--font-weight-bold) var(--font-size-4xl)/var(--line-height-tight) var(--font-family-display);
+  --typography-tablet-h2: var(--font-weight-bold) var(--font-size-3xl)/var(--line-height-tight) var(--font-family-display);
+  --typography-tablet-h3: var(--font-weight-semibold) var(--font-size-2xl)/var(--line-height-snug) var(--font-family-display);
+  --typography-tablet-body: var(--font-weight-normal) var(--font-size-lg)/var(--line-height-relaxed) var(--font-family-sans);
+
+  /* ========================================
+   * ACCESSIBILITY TYPOGRAPHY TOKENS
+   * ======================================== */
+
+  /* High contrast typography adjustments */
+  --typography-high-contrast-weight-boost: 100; /* Add to existing weight */
+  --typography-high-contrast-shadow: 0 0 2px currentColor;
+
+  /* Large text scale for accessibility */
+  --typography-a11y-large-scale: 1.2; /* 120% of normal size */
+  --typography-a11y-line-height: 1.75; /* Increased line height for readability */
+
+  /* Focus states typography */
+  --typography-focus-outline: 3px solid var(--focus-ring-color);
+  --typography-focus-offset: 2px;
+
+  /* ========================================
+   * PERFORMANCE TYPOGRAPHY TOKENS
+   * ======================================== */
+
+  /* Font display for web fonts */
+  --typography-font-display: swap; /* Ensure text remains visible during font load */
+
+  /* Subset and optimization hints */
+  --typography-unicode-range-latin: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+
+  /* Text rendering optimization */
+  --typography-text-rendering: optimizeLegibility;
+  --typography-font-smoothing: antialiased;
+  --typography-webkit-font-smoothing: antialiased;
+  --typography-moz-osx-font-smoothing: grayscale;
+}

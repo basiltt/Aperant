@@ -18,7 +18,7 @@ import { Textarea } from '../ui/textarea';
 import { Checkbox } from '../ui/checkbox';
 import { Switch } from '../ui/switch';
 import { Button } from '../ui/button';
-import { AgentProfileSelector } from '../AgentProfileSelector';
+import { AgentProfileSelector, type PhaseProviderConfig } from '../AgentProfileSelector';
 import { ClassificationFields } from './ClassificationFields';
 import { useImageUpload, type FileReferenceData } from './useImageUpload';
 import { createThumbnail } from '../ImageUpload';
@@ -66,6 +66,10 @@ interface TaskFormFieldsProps {
   onThinkingLevelChange: (level: ThinkingLevel | '') => void;
   onPhaseModelsChange: (config: PhaseModelConfig | undefined) => void;
   onPhaseThinkingChange: (config: PhaseThinkingConfig | undefined) => void;
+
+  // Per-phase provider selection (mixed provider mode)
+  phaseProviders?: PhaseProviderConfig;
+  onPhaseProvidersChange?: (providers: PhaseProviderConfig) => void;
 
   // Classification
   category: TaskCategory | '';
@@ -127,6 +131,8 @@ export function TaskFormFields({
   onThinkingLevelChange,
   onPhaseModelsChange,
   onPhaseThinkingChange,
+  phaseProviders,
+  onPhaseProvidersChange,
   category,
   priority,
   complexity,
@@ -474,11 +480,13 @@ export function TaskFormFields({
           thinkingLevel={thinkingLevel}
           phaseModels={phaseModels}
           phaseThinking={phaseThinking}
+          phaseProviders={phaseProviders}
           onProfileChange={onProfileChange}
           onModelChange={onModelChange}
           onThinkingLevelChange={onThinkingLevelChange}
           onPhaseModelsChange={onPhaseModelsChange}
           onPhaseThinkingChange={onPhaseThinkingChange}
+          onPhaseProvidersChange={onPhaseProvidersChange}
           disabled={disabled}
         />
 

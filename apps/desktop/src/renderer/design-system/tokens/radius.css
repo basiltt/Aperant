@@ -1,0 +1,257 @@
+/*
+ * Border Radius Design Tokens - Skeuomorphic Design System
+ *
+ * Material-appropriate border radius system that reflects the
+ * physical properties and natural characteristics of different materials.
+ */
+
+:root {
+  /* ========================================
+   * BASE RADIUS SCALE
+   * ======================================== */
+
+  /* Standard border radius scale */
+  --radius-none: 0px;
+  --radius-xs: 1px;     /* Minimal rounding */
+  --radius-sm: 2px;     /* Subtle curves */
+  --radius-md: 4px;     /* Standard rounding */
+  --radius-lg: 6px;     /* Gentle curves */
+  --radius-xl: 8px;     /* Noticeable rounding */
+  --radius-2xl: 12px;   /* Prominent curves */
+  --radius-3xl: 16px;   /* Strong rounding */
+  --radius-4xl: 24px;   /* Very round */
+  --radius-full: 9999px; /* Perfect circle/pill */
+
+  /* ========================================
+   * MATERIAL-SPECIFIC RADIUS MAPPINGS
+   * ======================================== */
+
+  /* Paper material - soft, organic curves like paper edges */
+  --radius-material-paper-sharp: var(--radius-xs);     /* Crisp paper cuts */
+  --radius-material-paper-soft: var(--radius-md);      /* Natural paper curves */
+  --radius-material-paper-curved: var(--radius-lg);    /* Gentle paper bends */
+  --radius-material-paper-rounded: var(--radius-xl);   /* Rounded paper corners */
+
+  /* Metal material - precise, manufactured edges */
+  --radius-material-metal-sharp: var(--radius-none);   /* Sharp metal edges */
+  --radius-material-metal-subtle: var(--radius-sm);    /* Slight chamfer */
+  --radius-material-metal-machined: var(--radius-md);  /* Machined corners */
+  --radius-material-metal-pressed: var(--radius-lg);   /* Pressed metal forms */
+
+  /* Wood material - natural, organic curves */
+  --radius-material-wood-natural: var(--radius-lg);    /* Naturally worn edges */
+  --radius-material-wood-carved: var(--radius-xl);     /* Hand-carved curves */
+  --radius-material-wood-turned: var(--radius-2xl);    /* Lathe-turned forms */
+  --radius-material-wood-organic: var(--radius-3xl);   /* Organic wood shapes */
+
+  /* Glass material - precise, clean edges */
+  --radius-material-glass-sharp: var(--radius-none);   /* Cut glass edges */
+  --radius-material-glass-polished: var(--radius-sm);  /* Polished edges */
+  --radius-material-glass-molded: var(--radius-md);    /* Molded glass forms */
+  --radius-material-glass-blown: var(--radius-lg);     /* Hand-blown curves */
+
+  /* Fabric material - soft, flexible curves */
+  --radius-material-fabric-draped: var(--radius-md);   /* Natural fabric drape */
+  --radius-material-fabric-folded: var(--radius-lg);   /* Fabric fold curves */
+  --radius-material-fabric-gathered: var(--radius-xl); /* Gathered fabric forms */
+
+  /* ========================================
+   * SEMANTIC RADIUS MAPPINGS
+   * ======================================== */
+
+  /* Interactive elements */
+  --radius-interactive-button: var(--radius-material-wood-natural);
+  --radius-interactive-input: var(--radius-material-metal-machined);
+  --radius-interactive-toggle: var(--radius-full);
+  --radius-interactive-chip: var(--radius-full);
+
+  /* Content containers */
+  --radius-container-card: var(--radius-material-paper-soft);
+  --radius-container-panel: var(--radius-material-paper-curved);
+  --radius-container-modal: var(--radius-material-glass-molded);
+  --radius-container-tooltip: var(--radius-material-glass-polished);
+
+  /* Navigation elements */
+  --radius-navigation-tab: var(--radius-material-metal-subtle);
+  --radius-navigation-pill: var(--radius-full);
+  --radius-navigation-breadcrumb: var(--radius-material-paper-soft);
+
+  /* Status and feedback elements */
+  --radius-status-badge: var(--radius-full);
+  --radius-status-alert: var(--radius-material-paper-curved);
+  --radius-status-toast: var(--radius-material-glass-molded);
+
+  /* ========================================
+   * COMPONENT-SPECIFIC RADIUS TOKENS
+   * ======================================== */
+
+  /* Button radius by variant */
+  --radius-button-primary: var(--radius-material-wood-natural);     /* Wood buttons */
+  --radius-button-secondary: var(--radius-material-metal-machined); /* Metal buttons */
+  --radius-button-tertiary: var(--radius-material-paper-soft);      /* Paper buttons */
+  --radius-button-ghost: var(--radius-material-glass-polished);     /* Glass buttons */
+  --radius-button-pill: var(--radius-full);                         /* Pill buttons */
+
+  /* Input radius by type */
+  --radius-input-text: var(--radius-material-metal-machined);       /* Text inputs */
+  --radius-input-search: var(--radius-full);                        /* Search inputs */
+  --radius-input-select: var(--radius-material-metal-subtle);       /* Select dropdowns */
+  --radius-input-checkbox: var(--radius-material-metal-subtle);     /* Checkboxes */
+  --radius-input-radio: var(--radius-full);                         /* Radio buttons */
+
+  /* Card radius by elevation */
+  --radius-card-flat: var(--radius-material-paper-sharp);           /* Flat cards */
+  --radius-card-raised: var(--radius-material-paper-soft);          /* Standard cards */
+  --radius-card-floating: var(--radius-material-paper-curved);      /* Floating cards */
+  --radius-card-modal: var(--radius-material-glass-molded);         /* Modal cards */
+
+  /* ========================================
+   * RESPONSIVE RADIUS ADJUSTMENTS
+   * ======================================== */
+
+  /* Mobile: Slightly larger radius for easier touch interaction */
+  --radius-mobile-multiplier: 1.2;
+  --radius-mobile-button: calc(var(--radius-button-primary) * var(--radius-mobile-multiplier));
+  --radius-mobile-input: calc(var(--radius-input-text) * var(--radius-mobile-multiplier));
+  --radius-mobile-card: calc(var(--radius-card-raised) * var(--radius-mobile-multiplier));
+
+  /* Tablet: Standard scaling */
+  --radius-tablet-multiplier: 1.0;
+  --radius-tablet-button: var(--radius-button-primary);
+  --radius-tablet-input: var(--radius-input-text);
+  --radius-tablet-card: var(--radius-card-raised);
+
+  /* Desktop: Full precision */
+  --radius-desktop-multiplier: 1.0;
+  --radius-desktop-button: var(--radius-button-primary);
+  --radius-desktop-input: var(--radius-input-text);
+  --radius-desktop-card: var(--radius-card-raised);
+
+  /* ========================================
+   * THEME-AWARE RADIUS ADJUSTMENTS
+   * ======================================== */
+
+  /* Default theme - natural, balanced curves */
+  --radius-theme-default-modifier: 1.0;
+
+  /* Dusk theme - softer, warmer curves */
+  --radius-theme-dusk-modifier: 1.1;
+
+  /* Ocean theme - flowing, organic curves */
+  --radius-theme-ocean-modifier: 1.2;
+
+  /* Lime theme - crisp, energetic curves */
+  --radius-theme-lime-modifier: 0.9;
+
+  /* Retro theme - rounded, vintage curves */
+  --radius-theme-retro-modifier: 1.3;
+
+  /* Neo theme - sharp, technological edges */
+  --radius-theme-neo-modifier: 0.7;
+
+  /* Forest theme - natural, organic curves */
+  --radius-theme-forest-modifier: 1.15;
+
+  /* ========================================
+   * ANIMATION RADIUS TOKENS
+   * ======================================== */
+
+  /* Radius transitions for state changes */
+  --radius-transition-duration: var(--duration-normal);
+  --radius-transition-easing: var(--easing-material-standard);
+
+  /* Hover radius adjustments */
+  --radius-hover-expansion: 1px; /* Slight radius increase on hover */
+
+  /* Active radius adjustments */
+  --radius-active-contraction: -1px; /* Slight radius decrease on press */
+
+  /* Focus radius adjustments */
+  --radius-focus-expansion: 2px; /* Radius increase for focus states */
+
+  /* ========================================
+   * ACCESSIBILITY RADIUS TOKENS
+   * ======================================== */
+
+  /* High contrast mode - more defined edges */
+  --radius-high-contrast-reduction: 0.8; /* Reduce radius for sharper edges */
+
+  /* Motor impairment considerations - larger, easier targets */
+  --radius-motor-accessible-minimum: var(--radius-lg); /* Minimum for easy interaction */
+
+  /* ========================================
+   * SPECIAL EFFECT RADIUS TOKENS
+   * ======================================== */
+
+  /* Clipping paths and masks */
+  --radius-clip-subtle: var(--radius-sm);
+  --radius-clip-moderate: var(--radius-md);
+  --radius-clip-strong: var(--radius-lg);
+
+  /* Image and media radius */
+  --radius-image-thumbnail: var(--radius-material-paper-soft);
+  --radius-image-hero: var(--radius-material-glass-molded);
+  --radius-image-avatar: var(--radius-full);
+
+  /* Border and outline radius */
+  --radius-border-subtle: calc(var(--radius-md) - 1px); /* Slightly smaller for nested borders */
+  --radius-outline-focus: calc(var(--radius-md) + var(--focus-ring-width)); /* Account for focus ring */
+
+  /* ========================================
+   * PERFORMANCE OPTIMIZATION TOKENS
+   * ======================================== */
+
+  /* GPU-friendly radius values (avoid subpixel values) */
+  --radius-gpu-optimized-sm: 2px;  /* Rounded to whole pixels */
+  --radius-gpu-optimized-md: 4px;  /* Rounded to whole pixels */
+  --radius-gpu-optimized-lg: 8px;  /* Rounded to whole pixels */
+  --radius-gpu-optimized-xl: 12px; /* Rounded to whole pixels */
+}
+
+/* ========================================
+ * UTILITY CLASSES
+ * ======================================== */
+
+/* Direct radius utility classes */
+.radius-none { border-radius: var(--radius-none); }
+.radius-xs { border-radius: var(--radius-xs); }
+.radius-sm { border-radius: var(--radius-sm); }
+.radius-md { border-radius: var(--radius-md); }
+.radius-lg { border-radius: var(--radius-lg); }
+.radius-xl { border-radius: var(--radius-xl); }
+.radius-2xl { border-radius: var(--radius-2xl); }
+.radius-3xl { border-radius: var(--radius-3xl); }
+.radius-4xl { border-radius: var(--radius-4xl); }
+.radius-full { border-radius: var(--radius-full); }
+
+/* Material-specific radius classes */
+.radius-paper { border-radius: var(--radius-material-paper-soft); }
+.radius-metal { border-radius: var(--radius-material-metal-machined); }
+.radius-wood { border-radius: var(--radius-material-wood-natural); }
+.radius-glass { border-radius: var(--radius-material-glass-molded); }
+.radius-fabric { border-radius: var(--radius-material-fabric-draped); }
+
+/* Component-specific radius classes */
+.radius-button { border-radius: var(--radius-button-primary); }
+.radius-input { border-radius: var(--radius-input-text); }
+.radius-card { border-radius: var(--radius-card-raised); }
+.radius-modal { border-radius: var(--radius-container-modal); }
+
+/* Responsive radius classes */
+@media (max-width: 767px) {
+  .radius-responsive-button { border-radius: var(--radius-mobile-button); }
+  .radius-responsive-input { border-radius: var(--radius-mobile-input); }
+  .radius-responsive-card { border-radius: var(--radius-mobile-card); }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .radius-responsive-button { border-radius: var(--radius-tablet-button); }
+  .radius-responsive-input { border-radius: var(--radius-tablet-input); }
+  .radius-responsive-card { border-radius: var(--radius-tablet-card); }
+}
+
+@media (min-width: 1024px) {
+  .radius-responsive-button { border-radius: var(--radius-desktop-button); }
+  .radius-responsive-input { border-radius: var(--radius-desktop-input); }
+  .radius-responsive-card { border-radius: var(--radius-desktop-card); }
+}

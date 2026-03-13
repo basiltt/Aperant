@@ -358,6 +358,10 @@ export interface AppSettings {
   sidebarCollapsed?: boolean;
   // GPU acceleration for terminal rendering (WebGL)
   gpuAcceleration?: GpuAcceleration;
+  // Proxy auto-start: if true, proxy server starts automatically on app launch
+  proxyEnabled?: boolean;
+  // Proxy provider: which backend the proxy routes to (copilot, openai, gemini, etc.)
+  proxyProvider?: string;
 }
 
 // GPU acceleration mode for terminal WebGL rendering
