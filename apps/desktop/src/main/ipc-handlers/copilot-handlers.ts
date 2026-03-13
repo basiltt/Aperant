@@ -637,5 +637,22 @@ export function registerCopilotHandlers(): void {
     }
   );
 
+  // Discover models auto — resolves GitHub token from stored accounts automatically
+  ipcMain.handle(
+    IPC_CHANNELS.COPILOT_DISCOVER_MODELS_AUTO,
+    async (): Promise<IPCResult<{ models: Array<{ id: string; name: string }> }>> => {
+      try {
+        const token = await resolveGitHubToken();
+        if (!token) throw new Error('No GitHub token found — sign in to GitHub Copilot first');
+        const models = await discoverCopilotModelsFromAPI(token);
+        return { success: true, data: { models } };
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        console.error('[Copilot] Auto model discovery failed:', errorMsg);
+        return { success: false, error: errorMsg };
+      }
+    }
+  );
+
   console.warn('[IPC] GitHub Copilot handlers registered');
 }

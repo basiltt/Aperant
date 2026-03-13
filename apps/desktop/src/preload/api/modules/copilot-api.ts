@@ -77,6 +77,7 @@ export interface CopilotAPI {
   copilotDeviceLogin: () => Promise<CopilotDeviceLoginResult>;
   copilotExchangeToken: (githubToken: string) => Promise<CopilotTokenExchangeResult>;
   copilotDiscoverModels: (githubToken: string) => Promise<CopilotModelDiscoveryResult>;
+  copilotDiscoverModelsAuto: () => Promise<CopilotModelDiscoveryResult>;
   onCopilotDeviceCode: (callback: (data: { userCode: string; verificationUri: string }) => void) => () => void;
 }
 
@@ -95,6 +96,9 @@ export const createCopilotAPI = (): CopilotAPI => ({
 
   copilotDiscoverModels: (githubToken: string): Promise<CopilotModelDiscoveryResult> =>
     invokeIpc(IPC_CHANNELS.COPILOT_DISCOVER_MODELS, githubToken),
+
+  copilotDiscoverModelsAuto: (): Promise<CopilotModelDiscoveryResult> =>
+    invokeIpc(IPC_CHANNELS.COPILOT_DISCOVER_MODELS_AUTO),
 
   onCopilotDeviceCode: (callback: (data: { userCode: string; verificationUri: string }) => void): (() => void) =>
     createIpcListener(IPC_CHANNELS.COPILOT_DEVICE_CODE, callback),

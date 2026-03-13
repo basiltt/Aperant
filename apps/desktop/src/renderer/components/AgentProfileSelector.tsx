@@ -104,6 +104,9 @@ export function AgentProfileSelector({
   // Ollama models are user-installed — fetch dynamically from the local server
   const [ollamaModels, setOllamaModels] = useState<Array<{ value: string; label: string }>>([]);
 
+  // GitHub Copilot models — fetched dynamically from the Copilot API
+  const [copilotModels, setCopilotModels] = useState<Array<{ value: string; label: string }>>([]);
+
   const fetchOllamaModels = useCallback(async (signal?: AbortSignal) => {
     try {
       const result = await window.electronAPI.listOllamaModels();
@@ -129,6 +132,18 @@ export function AgentProfileSelector({
     return () => { controller.abort(); };
   }, [activeProvider, fetchOllamaModels]);
 
+  // Fetch Copilot models dynamically when component mounts or when a copilot account exists
+  useEffect(() => {
+    let cancelled = false;
+    window.electronAPI.copilot?.copilotDiscoverModelsAuto?.().then(result => {
+      if (cancelled) return;
+      if (result?.success && result.data?.models) {
+        setCopilotModels(result.data.models.map((m: { id: string; name: string }) => ({ value: m.id, label: m.name })));
+      }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
   const isCustom = profileId === 'custom';
   const _isAuto = profileId === 'auto';
 
@@ -141,8 +156,12 @@ export function AgentProfileSelector({
   const availableProviders = useMemo(() => {
     const configured = new Set(providerAccounts.map(a => a.provider));
     configured.add(activeProvider || 'anthropic');
-    return PROVIDER_REGISTRY.filter(p => configured.has(p.id) && ALL_AVAILABLE_MODELS.some(m => m.provider === p.id));
-  }, [providerAccounts, activeProvider]);
+    return PROVIDER_REGISTRY.filter(p => configured.has(p.id) && (
+      ALL_AVAILABLE_MODELS.some(m => m.provider === p.id) ||
+      (p.id === 'github-copilot' && copilotModels.length > 0) ||
+      (p.id === 'ollama' && ollamaModels.length > 0)
+    ));
+  }, [providerAccounts, activeProvider, copilotModels, ollamaModels]);
 
   const defaultProvider = (activeProvider || 'anthropic') as BuiltinProvider;
   const currentPhaseProviders: PhaseProviderConfig = phaseProviders || {
@@ -155,11 +174,12 @@ export function AgentProfileSelector({
       return AVAILABLE_MODELS.map(m => ({ value: m.value, label: m.label }));
     }
     if (provider === 'ollama' && ollamaModels.length > 0) return ollamaModels;
+    if (provider === 'github-copilot' && copilotModels.length > 0) return copilotModels;
     const models = ALL_AVAILABLE_MODELS.filter(m => m.provider === provider);
     return models.length > 0
       ? models.map(m => ({ value: m.value, label: m.label }))
       : AVAILABLE_MODELS.map(m => ({ value: m.value, label: m.label }));
-  }, [ollamaModels]);
+  }, [ollamaModels, copilotModels]);
 
   const handlePhaseProviderChange = (phase: keyof PhaseModelConfig, newProvider: BuiltinProvider) => {
     if (onPhaseProvidersChange) {
@@ -181,12 +201,16 @@ export function AgentProfileSelector({
     if (activeProvider === 'ollama' && ollamaModels.length > 0) {
       return ollamaModels;
     }
+    // GitHub Copilot: use dynamically fetched models from API
+    if (activeProvider === 'github-copilot' && copilotModels.length > 0) {
+      return copilotModels;
+    }
     const providerModels = ALL_AVAILABLE_MODELS.filter(m => m.provider === activeProvider);
     if (providerModels.length === 0) {
       return AVAILABLE_MODELS.map(m => ({ value: m.value, label: m.label }));
     }
     return providerModels.map(m => ({ value: m.value, label: m.label }));
-  }, [activeProvider, ollamaModels]);
+  }, [activeProvider, ollamaModels, copilotModels]);
 
   const handleProfileSelect = (selectedId: string) => {
     if (selectedId === 'custom') {

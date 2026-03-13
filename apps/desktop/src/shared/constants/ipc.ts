@@ -602,6 +602,7 @@ export const IPC_CHANNELS = {
   COPILOT_DEVICE_CODE: 'copilot:deviceCode',
   COPILOT_EXCHANGE_TOKEN: 'copilot:exchangeToken',
   COPILOT_DISCOVER_MODELS: 'copilot:discoverModels',
+  COPILOT_DISCOVER_MODELS_AUTO: 'copilot:discoverModelsAuto',
 
   // Multi-provider proxy server
   PROXY_START: 'proxy:start',
