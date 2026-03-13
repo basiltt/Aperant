@@ -36,7 +36,7 @@ import {
   PHASE_KEYS,
   getProviderPreset
 } from '../../shared/constants';
-import { useSettingsStore } from '../stores/settings-store';
+import { useSettingsStore, saveSettings } from '../stores/settings-store';
 import { useActiveProvider } from '../hooks/useActiveProvider';
 
 interface TaskCreationWizardProps {
@@ -242,28 +242,34 @@ export function TaskCreationWizard({
           setShowClassification(true);
         }
       } else {
-        // No draft - reset to clean state for new task creation
-        // This ensures no stale data from previous task creation persists
+        // No draft - restore last-used form defaults from persistent settings
+        const defaults = settings.lastTaskFormDefaults;
         setTitle('');
         setDescription('');
-        setCategory('');
-        setPriority('');
-        setComplexity('');
-        setImpact('');
-        setProfileId(resolvedProfileId);
-        setModel(selectedProfile.model);
-        setThinkingLevel(selectedProfile.thinkingLevel);
-        setPhaseModels(resolvedPhaseModels);
-        setPhaseThinking(resolvedPhaseThinking);
+        setCategory((defaults?.category as TaskCategory) || '');
+        setPriority((defaults?.priority as TaskPriority) || '');
+        setComplexity((defaults?.complexity as TaskComplexity) || '');
+        setImpact((defaults?.impact as TaskImpact) || '');
+        setProfileId(defaults?.profileId || resolvedProfileId);
+        setModel((defaults?.model as ModelType) || selectedProfile.model);
+        setThinkingLevel((defaults?.thinkingLevel as ThinkingLevel) || selectedProfile.thinkingLevel);
+        setPhaseModels(defaults?.phaseModels || resolvedPhaseModels);
+        setPhaseThinking(defaults?.phaseThinking || resolvedPhaseThinking);
+        setPhaseProviders(defaults?.phaseProviders as PhaseProviderConfig | undefined);
         setImages([]);
         setReferencedFiles([]);
-        setRequireReviewBeforeCoding(false);
-        setFastMode(false);
+        setRequireReviewBeforeCoding(defaults?.requireReviewBeforeCoding ?? false);
+        setFastMode(defaults?.fastMode ?? false);
         setBaseBranch(PROJECT_DEFAULT_BRANCH);
-        setUseWorktree(true);
-        setPushNewBranches(projectPushNewBranches);
+        setUseWorktree(defaults?.useWorktree ?? true);
+        setPushNewBranches(defaults?.pushNewBranches ?? projectPushNewBranches);
         setIsDraftRestored(false);
-        setShowClassification(false);
+
+        if (defaults?.category || defaults?.priority || defaults?.complexity || defaults?.impact) {
+          setShowClassification(true);
+        } else {
+          setShowClassification(false);
+        }
         setShowFileExplorer(false);
         setShowGitOptions(false);
       }
@@ -559,6 +565,25 @@ export function TaskCreationWizard({
 
       const task = await createTask(projectId, title.trim(), description.trim(), metadata);
       if (task) {
+        // Persist form selections (not title/description) for next task creation
+        saveSettings({
+          lastTaskFormDefaults: {
+            profileId,
+            model: model || undefined,
+            thinkingLevel: thinkingLevel || undefined,
+            phaseModels,
+            phaseThinking,
+            phaseProviders: phaseProviders as Record<string, string> | undefined,
+            category: category || undefined,
+            priority: priority || undefined,
+            complexity: complexity || undefined,
+            impact: impact || undefined,
+            requireReviewBeforeCoding,
+            fastMode,
+            useWorktree,
+            pushNewBranches,
+          }
+        });
         clearDraft(projectId);
         resetForm();
         onOpenChange(false);

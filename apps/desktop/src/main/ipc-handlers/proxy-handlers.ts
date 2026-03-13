@@ -344,6 +344,17 @@ export async function startProxyInternal(provider: string = 'copilot'): Promise<
 }
 
 /**
+ * Check if the proxy is currently running and ready.
+ * Returns the proxy base URL if running, null otherwise.
+ */
+export function getProxyBaseURL(): string | null {
+  if (proxyProcess && !proxyProcess.killed && proxyReady) {
+    return `http://${PROXY_HOST}:${PROXY_PORT}`;
+  }
+  return null;
+}
+
+/**
  * Forcefully kill the proxy process.
  */
 export function shutdownProxy(): void {

@@ -11,7 +11,7 @@
  */
 import { useRef, useState, useEffect, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ChevronUp, Image as ImageIcon, X, Camera, Zap, Info } from 'lucide-react';
+import { ChevronDown, ChevronUp, Image as ImageIcon, X, Camera, Upload, Zap, Info } from 'lucide-react';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
@@ -167,6 +167,7 @@ export function TaskFormFields({
   const [showReferenceImages, setShowReferenceImages] = useState(false);
   const [screenshotModalOpen, setScreenshotModalOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<ImageAttachment | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-expand reference images section when images are added via paste/drop/capture
   const prevImagesLengthRef = useRef(images.length);
@@ -248,6 +249,7 @@ export function TaskFormFields({
     handleDragOver,
     handleDragLeave,
     handleDrop,
+    handleFileSelect,
     removeImage
   } = useImageUpload({
     images,
@@ -387,7 +389,7 @@ export function TaskFormFields({
               {t('tasks:referenceImages.description')}
             </p>
 
-            {/* Capture Button */}
+            {/* Capture & Upload Buttons */}
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -400,6 +402,29 @@ export function TaskFormFields({
                 <Camera className="h-4 w-4" />
                 {t('tasks:screenshot.capture')}
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={disabled}
+                className="gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                {t('common:buttons.upload', 'Upload')}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  handleFileSelect(e.target.files);
+                  // Reset so the same file can be selected again
+                  e.target.value = '';
+                }}
+              />
               <span className="text-xs text-muted-foreground">
                 {t('images.pasteHint', { shortcut: navigator.platform.includes('Mac') ? '⌘V' : 'Ctrl+V' })}
               </span>

@@ -64,6 +64,8 @@ interface UseImageUploadReturn {
   handleDragLeave: (e: DragEvent<HTMLTextAreaElement>) => void;
   /** Handle drop event on textarea */
   handleDrop: (e: DragEvent<HTMLTextAreaElement>) => Promise<void>;
+  /** Handle file input selection (for browse button) */
+  handleFileSelect: (files: FileList | null) => Promise<void>;
   /** Remove an image by ID */
   removeImage: (imageId: string) => void;
   /** Whether more images can be added */
@@ -208,24 +210,55 @@ export function useImageUpload({
   const handlePaste = useCallback(
     async (e: ClipboardEvent<HTMLTextAreaElement>) => {
       const clipboardItems = e.clipboardData?.items;
-      if (!clipboardItems) return;
+      if (!clipboardItems) {
+        console.debug('[useImageUpload] handlePaste: no clipboardData.items');
+        return;
+      }
 
       // Find image items in clipboard
       const imageItems: DataTransferItem[] = [];
       for (let i = 0; i < clipboardItems.length; i++) {
         const item = clipboardItems[i];
+        console.debug(`[useImageUpload] handlePaste: clipboard item ${i}: kind=${item.kind}, type=${item.type}`);
         if (item.type.startsWith('image/')) {
           imageItems.push(item);
         }
       }
 
       // If no images, allow normal paste behavior
-      if (imageItems.length === 0) return;
+      if (imageItems.length === 0) {
+        console.debug('[useImageUpload] handlePaste: no image items found in clipboard');
+        return;
+      }
+
+      console.debug(`[useImageUpload] handlePaste: found ${imageItems.length} image item(s), processing...`);
 
       // Prevent default paste when we have images
       e.preventDefault();
 
       await processImageItems(imageItems, { isFromPaste: true });
+    },
+    [processImageItems]
+  );
+
+  /**
+   * Handle file input selection (for browse button)
+   */
+  const handleFileSelect = useCallback(
+    async (files: FileList | null) => {
+      if (!files || files.length === 0) return;
+
+      const imageFiles: File[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type.startsWith('image/')) {
+          imageFiles.push(file);
+        }
+      }
+
+      if (imageFiles.length === 0) return;
+
+      await processImageItems(imageFiles, { isFromPaste: false });
     },
     [processImageItems]
   );
@@ -357,6 +390,7 @@ export function useImageUpload({
     handleDragOver,
     handleDragLeave,
     handleDrop,
+    handleFileSelect,
     removeImage,
     canAddMore,
     remainingSlots

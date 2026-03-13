@@ -28,6 +28,7 @@ import { createOrGetWorktree } from '../ai/worktree';
 import { findTaskWorktree } from '../worktree-paths';
 import { readSettingsFile } from '../settings-utils';
 import type { ProviderAccount } from '../../shared/types/provider-account';
+import { getProxyBaseURL } from '../ipc-handlers/proxy-handlers';
 import { tryLoadPrompt } from '../ai/prompts/prompt-loader';
 
 /**
@@ -119,18 +120,21 @@ export class AgentManager extends EventEmitter {
   }
 
   /**
-   * Check if any provider account is configured (API key or OAuth).
+   * Check if any provider account is configured (API key or OAuth),
+   * or if the Copilot proxy is running (acts as an implicit provider).
    * Used to bypass the legacy hasValidAuth() check for non-Anthropic providers.
    */
   private hasAnyProviderAccount(): boolean {
     const settings = readSettingsFile();
     const accounts = (settings?.providerAccounts as ProviderAccount[] | undefined) ?? [];
-    return accounts.length > 0;
+    return accounts.length > 0 || getProxyBaseURL() !== null;
   }
 
   /**
    * Resolve auth using the provider accounts priority queue.
    * Falls back to legacy Claude profile if no provider accounts exist.
+   * When GitHub Copilot is the preferred provider and the proxy is running,
+   * routes through the local proxy server which translates Anthropic API → Copilot API.
    */
   private async resolveAuthFromProviderQueue(
     requestedModel: string,
@@ -141,6 +145,29 @@ export class AgentManager extends EventEmitter {
     modelId: string;
     configDir?: string;
   }> {
+    // Check if the preferred provider is GitHub Copilot and proxy is running.
+    // The proxy translates Anthropic-format API calls to GitHub Copilot API,
+    // so we use provider='anthropic' with the proxy base URL.
+    if (preferredProvider === 'github-copilot') {
+      const proxyBaseURL = getProxyBaseURL();
+      if (proxyBaseURL) {
+        // The proxy speaks Anthropic API format and handles model mapping internally.
+        // Pass the model ID as-is — the proxy will route to the correct Copilot model.
+        // Append /v1 because the Anthropic SDK appends /messages to the baseURL,
+        // and the proxy expects POST /v1/messages (not /messages).
+        const proxyApiURL = `${proxyBaseURL}/v1`;
+        console.warn(`[AgentManager] Routing through Copilot proxy: baseURL=${proxyApiURL} model=${requestedModel}`);
+        return {
+          auth: {
+            apiKey: 'copilot-proxy',  // Placeholder — proxy handles real auth via GitHub token
+            baseURL: proxyApiURL,
+          },
+          provider: 'anthropic',  // Proxy speaks Anthropic API format
+          modelId: requestedModel,
+        };
+      }
+      console.warn('[AgentManager] GitHub Copilot preferred but proxy is not running — falling through to provider queue');
+    }
     // Read provider accounts and priority order from settings
     const settings = readSettingsFile();
     const accounts = (settings?.providerAccounts as ProviderAccount[] | undefined) ?? [];

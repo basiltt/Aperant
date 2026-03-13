@@ -362,6 +362,26 @@ export interface AppSettings {
   proxyEnabled?: boolean;
   // Proxy provider: which backend the proxy routes to (copilot, openai, gemini, etc.)
   proxyProvider?: string;
+  // Remember last task creation form selections across sessions
+  lastTaskFormDefaults?: LastTaskFormDefaults;
+}
+
+// Persisted form defaults from the last created task
+export interface LastTaskFormDefaults {
+  profileId?: string;
+  model?: string;
+  thinkingLevel?: string;
+  phaseModels?: PhaseModelConfig;
+  phaseThinking?: PhaseThinkingConfig;
+  phaseProviders?: Record<string, string>;
+  category?: string;
+  priority?: string;
+  complexity?: string;
+  impact?: string;
+  requireReviewBeforeCoding?: boolean;
+  fastMode?: boolean;
+  useWorktree?: boolean;
+  pushNewBranches?: boolean;
 }
 
 // GPU acceleration mode for terminal WebGL rendering
