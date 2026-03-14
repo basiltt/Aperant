@@ -37,8 +37,18 @@ import type { SessionResult } from '../session/types';
 // Constants
 // =============================================================================
 
-/** Maximum retries for a single phase */
+/** Maximum retries for a single phase (logical errors, schema failures, etc.) */
 const MAX_PHASE_RETRIES = 2;
+
+/** Maximum retries for transient/network errors before counting as a real failure.
+ *  Network errors retry with exponential backoff and do NOT count against MAX_PHASE_RETRIES. */
+const MAX_TRANSIENT_RETRIES = 20;
+
+/** Base delay for transient error backoff (ms). Grows exponentially: 2s, 4s, 8s, 16s, capped at 60s. */
+const TRANSIENT_RETRY_BASE_DELAY_MS = 2_000;
+
+/** Maximum backoff delay for transient retries (ms). */
+const TRANSIENT_RETRY_MAX_DELAY_MS = 60_000;
 
 /** Maximum characters of a single phase output to carry forward */
 const MAX_PHASE_OUTPUT_SIZE = 12_000;
@@ -403,6 +413,9 @@ export class SpecOrchestrator extends EventEmitter {
 
   /**
    * Run a single spec phase with retries.
+   * Logical errors (schema validation, missing files) count against MAX_PHASE_RETRIES.
+   * Transient errors (stream timeout, rate limit, network) retry with exponential
+   * backoff and do NOT consume logical retry budget.
    */
   private async runPhase(
     phase: SpecPhase,
@@ -417,9 +430,12 @@ export class SpecOrchestrator extends EventEmitter {
 
     this.emitTyped('phase-start', phase, phaseNumber, totalPhases);
 
-    for (let attempt = 0; attempt <= MAX_PHASE_RETRIES; attempt++) {
+    let logicalAttempt = 0;   // Counts against MAX_PHASE_RETRIES
+    let transientAttempt = 0; // Counts against MAX_TRANSIENT_RETRIES (backoff)
+
+    while (logicalAttempt <= MAX_PHASE_RETRIES) {
       if (this.aborted) {
-        return { phase, success: false, errors: ['Cancelled'], retries: attempt };
+        return { phase, success: false, errors: ['Cancelled'], retries: logicalAttempt };
       }
 
       this.sessionNumber++;
@@ -434,7 +450,7 @@ export class SpecOrchestrator extends EventEmitter {
         complexity: this.assessment?.complexity,
         projectIndex: this.config.projectIndex,
         priorPhaseOutputs: phaseOutputs,
-        attemptCount: attempt,
+        attemptCount: logicalAttempt,
         // Carry both schema and tool-use retry context (at most one is set at a time)
         schemaRetryContext: schemaRetryContext ?? toolUseRetryContext,
       });
@@ -467,7 +483,7 @@ export class SpecOrchestrator extends EventEmitter {
       this.emitTyped('session-complete', result, phase);
 
       if (result.outcome === 'cancelled') {
-        return { phase, success: false, errors: ['Cancelled'], retries: attempt };
+        return { phase, success: false, errors: ['Cancelled'], retries: logicalAttempt };
       }
 
       if (result.outcome === 'completed' || result.outcome === 'max_steps' || result.outcome === 'context_window') {
@@ -493,9 +509,9 @@ export class SpecOrchestrator extends EventEmitter {
             ? `Model completed session without making any tool calls — expected files not created: ${missingFiles.join(', ')}`
             : `Phase completed but expected output files missing: ${missingFiles.join(', ')}`;
           errors.push(detail);
-          this.emitTyped('log', `Phase ${phase} output validation failed (attempt ${attempt + 1}): ${detail}`);
+          this.emitTyped('log', `Phase ${phase} output validation failed (attempt ${logicalAttempt + 1}): ${detail}`);
 
-          if (attempt < MAX_PHASE_RETRIES) {
+          if (logicalAttempt < MAX_PHASE_RETRIES) {
             // Build a directive retry prompt when the model hallucinated tool usage.
             // This is common with Codex models that generate text claiming to have
             // written files without actually invoking the Write tool.
@@ -516,6 +532,8 @@ export class SpecOrchestrator extends EventEmitter {
                 '3. Do NOT skip tool calls or assume files were already created',
               ].join('\n');
             }
+            logicalAttempt++;
+            transientAttempt = 0; // Reset transient counter on logical retry
             continue; // Retry the phase
           }
           // All retries exhausted — fall through to failure
@@ -527,8 +545,8 @@ export class SpecOrchestrator extends EventEmitter {
         const schemaValidation = await this.validatePhaseSchema(phase);
         if (schemaValidation && !schemaValidation.valid) {
           errors.push(`Schema validation failed: ${schemaValidation.errors.join(', ')}`);
-          this.emitTyped('log', `Phase ${phase} schema validation failed (attempt ${attempt + 1}): ${schemaValidation.errors.join(', ')}`);
-          if (attempt < MAX_PHASE_RETRIES) {
+          this.emitTyped('log', `Phase ${phase} schema validation failed (attempt ${logicalAttempt + 1}): ${schemaValidation.errors.join(', ')}`);
+          if (logicalAttempt < MAX_PHASE_RETRIES) {
             // Build LLM-friendly error feedback so the agent knows what to fix
             const schemaHint = (phase === 'planning' || phase === 'quick_spec')
               ? IMPLEMENTATION_PLAN_SCHEMA_HINT
@@ -538,31 +556,61 @@ export class SpecOrchestrator extends EventEmitter {
               schemaValidation.errors,
               schemaHint,
             );
+            logicalAttempt++;
+            transientAttempt = 0; // Reset transient counter on logical retry
             continue; // Retry with error feedback
           }
           break;
         }
 
-        const phaseResult: SpecPhaseResult = { phase, success: true, errors: [], retries: attempt };
+        const phaseResult: SpecPhaseResult = { phase, success: true, errors: [], retries: logicalAttempt };
         this.emitTyped('phase-complete', phase, phaseResult);
         return phaseResult;
       }
 
-      // Error — collect and maybe retry
+      // ----- Transient / network errors: retry with backoff, don't consume logical budget -----
+      const isTransient = result.error?.retryable === true
+        || result.outcome === 'rate_limited'
+        || result.error?.code === 'stream_timeout'
+        || result.error?.code === 'network_error';
+
+      if (isTransient) {
+        if (transientAttempt < MAX_TRANSIENT_RETRIES) {
+          const delay = Math.min(
+            TRANSIENT_RETRY_BASE_DELAY_MS * Math.pow(2, transientAttempt),
+            TRANSIENT_RETRY_MAX_DELAY_MS,
+          );
+          const errorMsg = result.error?.message ?? result.outcome;
+          this.emitTyped(
+            'log',
+            `Phase ${phase} transient error (${errorMsg}), retrying in ${Math.round(delay / 1000)}s (transient attempt ${transientAttempt + 1}/${MAX_TRANSIENT_RETRIES})...`,
+          );
+          transientAttempt++;
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue; // Retry without incrementing logicalAttempt
+        }
+        // Transient retries exhausted — count as a logical failure
+        this.emitTyped('log', `Phase ${phase} transient retries exhausted (${MAX_TRANSIENT_RETRIES}), counting as logical failure`);
+        transientAttempt = 0;
+      }
+
+      // ----- Non-transient errors -----
       const errorMsg = result.error?.message ?? `Phase ${phase} failed with outcome: ${result.outcome}`;
       errors.push(errorMsg);
 
-      // Non-retryable errors
+      // Non-retryable errors (hard stop)
       if (result.outcome === 'auth_failure') {
-        return { phase, success: false, errors, retries: attempt };
+        return { phase, success: false, errors, retries: logicalAttempt };
       }
 
-      if (attempt < MAX_PHASE_RETRIES) {
-        this.emitTyped('log', `Phase ${phase} failed (attempt ${attempt + 1}), retrying...`);
+      if (logicalAttempt < MAX_PHASE_RETRIES) {
+        this.emitTyped('log', `Phase ${phase} failed (attempt ${logicalAttempt + 1}), retrying...`);
       }
+      logicalAttempt++;
+      transientAttempt = 0; // Reset transient counter on logical retry
     }
 
-    const failResult: SpecPhaseResult = { phase, success: false, errors, retries: MAX_PHASE_RETRIES };
+    const failResult: SpecPhaseResult = { phase, success: false, errors, retries: logicalAttempt };
     this.emitTyped('phase-complete', phase, failResult);
     return failResult;
   }

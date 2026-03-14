@@ -291,11 +291,60 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
             except Exception:
                 logger.info("Upstream request: body_size=%d", len(req_body))
 
-            # Connect to upstream provider
-            conn = provider.get_connection()
+            # Connect to upstream provider with retry for network errors
+            MAX_UPSTREAM_RETRIES = 20
+            UPSTREAM_RETRY_BASE_DELAY = 2.0  # seconds
+            UPSTREAM_RETRY_MAX_DELAY = 60.0  # seconds
+
+            conn = None
+            upstream_resp = None
+            last_err = None
+
+            for net_attempt in range(MAX_UPSTREAM_RETRIES):
+                try:
+                    conn = provider.get_connection()
+                    conn.request(method, path, body=req_body, headers=headers)
+                    upstream_resp = conn.getresponse()
+                    last_err = None
+                    break  # Success
+                except (
+                    ConnectionError,
+                    ConnectionRefusedError,
+                    ConnectionResetError,
+                    ConnectionAbortedError,
+                    TimeoutError,
+                    OSError,
+                    BrokenPipeError,
+                ) as e:
+                    last_err = e
+                    if conn:
+                        try:
+                            conn.close()
+                        except Exception:
+                            pass
+                    delay = min(
+                        UPSTREAM_RETRY_BASE_DELAY * (2 ** net_attempt),
+                        UPSTREAM_RETRY_MAX_DELAY,
+                    )
+                    logger.warning(
+                        "Upstream connection failed (attempt %d/%d): %s — retrying in %.1fs",
+                        net_attempt + 1, MAX_UPSTREAM_RETRIES, e, delay,
+                    )
+                    time.sleep(delay)
+
+            if last_err is not None:
+                logger.error(
+                    "Upstream connection failed after %d attempts: %s",
+                    MAX_UPSTREAM_RETRIES, last_err,
+                )
+                self._send_error(
+                    502,
+                    "network_error",
+                    f"Could not connect to upstream after {MAX_UPSTREAM_RETRIES} attempts: {last_err}",
+                )
+                return
+
             try:
-                conn.request(method, path, body=req_body, headers=headers)
-                upstream_resp = conn.getresponse()
 
                 # Some Copilot/OpenAI-compatible requests fail intermittently with
                 # HTTP 400 when the tool payload is large. Retry once with fewer

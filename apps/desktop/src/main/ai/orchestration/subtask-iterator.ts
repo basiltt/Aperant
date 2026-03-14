@@ -225,7 +225,37 @@ export async function iterateSubtasks(
         return { totalSubtasks, completedSubtasks, stuckSubtasks, cancelled: true };
       }
 
+      // Don't count transient auth issues against retry budget
+      attemptCounts.set(subtask.id, currentAttempt - 1);
       // Continue — subtask will be retried with fresh auth
+      continue;
+    }
+
+    // --- Transient / network errors: retry with backoff, don't consume retry budget ---
+    const isTransient = result.outcome === 'error'
+      && (result.error?.retryable === true
+        || result.error?.code === 'stream_timeout'
+        || result.error?.code === 'network_error');
+
+    if (isTransient) {
+      // Don't count transient errors against the subtask retry budget
+      attemptCounts.set(subtask.id, currentAttempt - 1);
+
+      const transientKey = `__transient_${subtask.id}`;
+      const transientCount = (attemptCounts.get(transientKey) ?? 0) + 1;
+      attemptCounts.set(transientKey, transientCount);
+
+      // Exponential backoff: 2s, 4s, 8s, 16s, 32s, capped at 60s
+      const backoffDelay = Math.min(2_000 * Math.pow(2, transientCount - 1), 60_000);
+      const errMsg = result.error?.message ?? 'transient error';
+      config.onSubtaskStart && void 0; // no-op to avoid unused
+      // Log via the complete callback (already called above)
+
+      await delay(backoffDelay, config.abortSignal);
+
+      if (config.abortSignal?.aborted) {
+        return { totalSubtasks, completedSubtasks, stuckSubtasks, cancelled: true };
+      }
       continue;
     }
 

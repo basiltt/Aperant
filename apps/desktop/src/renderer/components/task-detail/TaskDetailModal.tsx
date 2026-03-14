@@ -304,6 +304,36 @@ function TaskDetailModalContent({ open, task, onOpenChange, onSwitchToTerminals,
       );
     }
 
+    if (task.status === 'human_review') {
+      return (
+        <div className="flex items-center gap-2">
+          {task.reviewReason === 'plan_review' ? (
+            <>
+              <Button
+                variant="default"
+                onClick={() => submitReview(task.id, true)}
+              >
+                <Play className="mr-2 h-4 w-4" />
+                Approve Plan
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => submitReview(task.id, false)}
+              >
+                <Square className="mr-2 h-4 w-4" />
+                Reject
+              </Button>
+            </>
+          ) : (
+            <Button variant="default" onClick={handleStartStop}>
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Retry Task
+            </Button>
+          )}
+        </div>
+      );
+    }
+
     if (task.status === 'done' && task.metadata?.prUrl) {
       return (
         <div className="flex items-center gap-4">

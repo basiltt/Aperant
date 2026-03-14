@@ -52,6 +52,15 @@ const MAX_SUBTASK_RETRIES = 3;
 /** Delay before retrying after an error (ms) */
 const ERROR_RETRY_DELAY_MS = 5_000;
 
+/** Maximum retries for transient/network errors (stream timeout, rate limit) before counting as logical failure. */
+const MAX_TRANSIENT_RETRIES = 20;
+
+/** Base delay for transient error backoff (ms). Grows exponentially: 2s, 4s, 8s…, capped at 60s. */
+const TRANSIENT_RETRY_BASE_DELAY_MS = 2_000;
+
+/** Maximum backoff delay for transient retries (ms). */
+const TRANSIENT_RETRY_MAX_DELAY_MS = 60_000;
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -306,6 +315,7 @@ export class BuildOrchestrator extends EventEmitter {
     this.transitionPhase('planning', 'Creating implementation plan');
     let planningRetryContext: string | undefined;
     let validationFailures = 0;
+    let transientAttempt = 0;
 
     for (let attempt = 0; attempt < MAX_PLANNING_VALIDATION_RETRIES + 1; attempt++) {
       if (this.aborted) {
@@ -340,9 +350,40 @@ export class BuildOrchestrator extends EventEmitter {
         return { success: false, error: 'Build cancelled' };
       }
 
+      // --- Transient / network errors: retry with backoff, don't consume planning attempt ---
+      const isTransient = result.error?.retryable === true
+        || result.outcome === 'rate_limited'
+        || result.error?.code === 'stream_timeout'
+        || result.error?.code === 'network_error';
+
       if (result.outcome === 'error' || result.outcome === 'auth_failure' || result.outcome === 'rate_limited') {
+        // Hard stop for auth failures
+        if (result.outcome === 'auth_failure') {
+          return { success: false, error: result.error?.message ?? 'Planning session failed' };
+        }
+
+        if (isTransient && transientAttempt < MAX_TRANSIENT_RETRIES) {
+          const delay = Math.min(
+            TRANSIENT_RETRY_BASE_DELAY_MS * Math.pow(2, transientAttempt),
+            TRANSIENT_RETRY_MAX_DELAY_MS,
+          );
+          const errMsg = result.error?.message ?? result.outcome;
+          this.emitTyped(
+            'log',
+            `Planning transient error (${errMsg}), retrying in ${Math.round(delay / 1000)}s (transient ${transientAttempt + 1}/${MAX_TRANSIENT_RETRIES})...`,
+          );
+          transientAttempt++;
+          await new Promise(resolve => setTimeout(resolve, delay));
+          attempt--; // Don't consume a planning attempt
+          continue;
+        }
+
+        // Non-transient or transient retries exhausted
         return { success: false, error: result.error?.message ?? 'Planning session failed' };
       }
+
+      // Reset transient counter on success
+      transientAttempt = 0;
 
       // If the provider returned structured output via constrained decoding,
       // write it to the plan file — this is guaranteed to match the schema.
