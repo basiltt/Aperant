@@ -11,7 +11,6 @@
 
 import { existsSync } from 'fs';
 import path from 'path';
-import { app } from 'electron';
 import type { McpServerConfig, McpServerId } from './types';
 
 // =============================================================================
@@ -180,11 +179,10 @@ export function getMcpServerConfig(
 
     case 'auto-claude': {
       // The auto-claude MCP server script must exist on disk.
-      // In development, check apps/desktop/; in production, check the app resources.
       const serverScript = 'auto-claude-mcp-server.js';
-      const devPath = path.join(app.getAppPath(), serverScript);
-      if (!existsSync(devPath)) {
-        console.warn(`[MCP Registry] Skipping auto-claude server: ${serverScript} not found at ${devPath}`);
+      const scriptPath = path.resolve(process.cwd(), serverScript);
+      if (!existsSync(scriptPath)) {
+        console.warn(`[MCP Registry] Skipping auto-claude server: ${serverScript} not found at ${scriptPath}`);
         return null;
       }
       const specDir = options.specDir ?? '';
