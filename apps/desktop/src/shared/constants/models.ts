@@ -571,6 +571,25 @@ export function getReasoningConfigForModel(
     }
   }
 
+  // For github-copilot provider, infer reasoning config from the model name
+  // when the model isn't in the static ALL_AVAILABLE_MODELS list (dynamic models
+  // fetched from the Copilot API at runtime, e.g. "claude-opus-4.6", "gpt-5.4").
+  if (provider === 'github-copilot') {
+    const lm = modelValue.toLowerCase();
+    if (lm.startsWith('claude-')) {
+      // Claude models via Copilot support Anthropic-style thinking tokens
+      return { type: 'thinking_tokens', level: 'medium' };
+    }
+    if (lm.startsWith('o1-') || lm.startsWith('o3-') || lm.startsWith('o4-')) {
+      // OpenAI reasoning models use effort-based reasoning
+      return { type: 'reasoning_effort', level: 'medium' };
+    }
+    if (lm.startsWith('gemini-')) {
+      return { type: 'thinking_toggle', level: 'medium' };
+    }
+    // Other Copilot models (gpt-*, etc.) don't support thinking
+  }
+
   return { type: 'none' };
 }
 

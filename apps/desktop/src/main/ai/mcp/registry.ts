@@ -9,6 +9,9 @@
  * and whether it's enabled by default.
  */
 
+import { existsSync } from 'fs';
+import path from 'path';
+import { app } from 'electron';
 import type { McpServerConfig, McpServerId } from './types';
 
 // =============================================================================
@@ -176,6 +179,14 @@ export function getMcpServerConfig(
       return PUPPETEER_SERVER;
 
     case 'auto-claude': {
+      // The auto-claude MCP server script must exist on disk.
+      // In development, check apps/desktop/; in production, check the app resources.
+      const serverScript = 'auto-claude-mcp-server.js';
+      const devPath = path.join(app.getAppPath(), serverScript);
+      if (!existsSync(devPath)) {
+        console.warn(`[MCP Registry] Skipping auto-claude server: ${serverScript} not found at ${devPath}`);
+        return null;
+      }
       const specDir = options.specDir ?? '';
       return createAutoClaudeServer(specDir);
     }

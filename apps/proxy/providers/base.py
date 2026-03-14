@@ -95,17 +95,21 @@ class BaseProvider(abc.ABC):
         """Map an Anthropic model name to this provider's equivalent.
 
         If the model is in model_map, return the provider-specific mapping.
-        If it's an unmapped Anthropic model (starts with 'claude-'), fall back
-        to the provider's default_model.
-        Otherwise treat it as a provider-native model ID and pass through.
+        If it's an unmapped Anthropic full-date model ID (e.g.,
+        ``claude-sonnet-4-20250514``), fall back to the provider's default_model.
+        Otherwise treat it as a provider-native model ID and pass through
+        (e.g., Copilot-native ``claude-opus-4.6``).
         """
         provider_name = self.config.get("_provider_name", "")
         if anthropic_model in model_map:
             mapped = model_map[anthropic_model].get(provider_name)
             if mapped:
                 return mapped
-        # Unmapped Anthropic model → use provider default
-        if anthropic_model.startswith("claude-"):
+        # Only fall back to default_model for full Anthropic date-versioned IDs
+        # (e.g. "claude-sonnet-4-20250514") that are NOT in the explicit model_map.
+        # Copilot-native short model IDs (e.g. "claude-opus-4.6") should pass through.
+        import re
+        if anthropic_model.startswith("claude-") and re.search(r"-\d{8}$", anthropic_model):
             return self.default_model or anthropic_model
         # Provider-native model ID → pass through as-is
         return anthropic_model

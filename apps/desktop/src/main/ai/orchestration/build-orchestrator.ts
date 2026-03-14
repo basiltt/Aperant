@@ -672,12 +672,19 @@ export class BuildOrchestrator extends EventEmitter {
   // ===========================================================================
 
   /**
-   * Check if this is a first run (no implementation plan exists).
+   * Check if this is a first run (no implementation plan exists or plan has no phases).
    */
   private async isFirstRun(): Promise<boolean> {
     const planPath = join(this.config.specDir, 'implementation_plan.json');
     try {
-      await readFile(planPath, 'utf-8');
+      const raw = await readFile(planPath, 'utf-8');
+      // Plan file exists but may be malformed or have empty phases
+      // (e.g., spec creation was interrupted before writing phases).
+      // Treat as first run so the planning phase regenerates it.
+      const plan = safeParseJson<{ phases?: unknown[] }>(raw);
+      if (!plan || !Array.isArray(plan.phases) || plan.phases.length === 0) {
+        return true;
+      }
       return false;
     } catch {
       return true;

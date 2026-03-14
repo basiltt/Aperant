@@ -28,7 +28,7 @@ import { createOrGetWorktree } from '../ai/worktree';
 import { findTaskWorktree } from '../worktree-paths';
 import { readSettingsFile } from '../settings-utils';
 import type { ProviderAccount } from '../../shared/types/provider-account';
-import { getProxyBaseURL } from '../ipc-handlers/proxy-handlers';
+import { getProxyBaseURL, setProxyModel } from '../ipc-handlers/proxy-handlers';
 import { tryLoadPrompt } from '../ai/prompts/prompt-loader';
 
 /**
@@ -156,6 +156,11 @@ export class AgentManager extends EventEmitter {
         // Append /v1 because the Anthropic SDK appends /messages to the baseURL,
         // and the proxy expects POST /v1/messages (not /messages).
         const proxyApiURL = `${proxyBaseURL}/v1`;
+        // Tell the proxy which model to use — this sets an override that
+        // bypasses the proxy's model_map, ensuring Copilot-native model IDs
+        // (e.g. "claude-opus-4.6") are forwarded as-is instead of being
+        // mapped to the default_model ("claude-sonnet-4").
+        await setProxyModel(requestedModel);
         console.warn(`[AgentManager] Routing through Copilot proxy: baseURL=${proxyApiURL} model=${requestedModel}`);
         return {
           auth: {

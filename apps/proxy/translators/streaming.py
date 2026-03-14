@@ -29,9 +29,49 @@ Anthropic expects:
 import http.client
 import json
 import logging
+import re
 from typing import Any, Generator
 
 logger = logging.getLogger(__name__)
+
+
+# Regex matching a single backslash that is NOT followed by another backslash
+# or a double-quote (the two structural JSON escape sequences we must preserve).
+# This is used to fix Windows paths where models emit c:\users instead of c:\\users.
+_LONE_BACKSLASH_RE = re.compile(r'\\(?![\\"])')
+
+
+def _repair_tool_args_json(raw: str) -> str:
+    """Repair common JSON issues in tool call arguments from streaming models.
+
+    Models routed through the Copilot API sometimes generate Windows file
+    paths with unescaped single backslashes (e.g., ``c:\\users\\ttbasil``
+    in the raw tool arguments).  JSON treats ``\\t``, ``\\u``, ``\\a``,
+    etc. as escape sequences, so the parser fails.
+
+    Strategy: escape ALL bare backslashes except ``\\\\`` (already-escaped)
+    and ``\\\"`` (escaped quotes).  This turns ``\\t`` → ``\\\\t`` and
+    ``\\u`` → ``\\\\u``.  The tradeoff is that real ``\\n`` / ``\\t``
+    escapes in content values become literal backslash+char, but tool args
+    (file paths + content) rarely use raw escape sequences — actual
+    newlines/tabs appear as real characters in multi-line strings.
+    """
+    try:
+        json.loads(raw)
+        return raw  # Already valid — nothing to fix
+    except (json.JSONDecodeError, ValueError):
+        pass
+
+    # Escape lone backslashes (not part of \\ or \")
+    fixed = _LONE_BACKSLASH_RE.sub(r'\\\\', raw)
+
+    try:
+        json.loads(fixed)
+        logger.info("Repaired tool args JSON (fixed backslash escaping)")
+        return fixed
+    except (json.JSONDecodeError, ValueError):
+        logger.warning("Could not repair tool args JSON, returning original")
+        return raw
 
 
 def _normalize_stream_text_delta(fragment: str, state: dict[str, Any]) -> str:
@@ -369,18 +409,13 @@ def openai_stream_to_anthropic(
                 if not state["started"] and state["name"]:
                     yield f"event: content_block_start\ndata: {_make_content_block_start(state['block_index'], 'tool_use', id=state['id'], name=state['name'])}"
                     state["started"] = True
-                    # Flush buffered args
-                    if state["buffered_args"]:
-                        yield f"event: content_block_delta\ndata: {_make_content_block_delta(state['block_index'], 'input_json_delta', partial_json=state['buffered_args'])}"
-                        state["buffered_args"] = ""
 
-                # Handle argument deltas
+                # Buffer ALL argument deltas — we emit them repaired
+                # at block close to fix broken JSON (e.g., unescaped
+                # Windows backslashes in file paths).
                 arg_delta = func.get("arguments", "")
                 if arg_delta:
-                    if state["started"]:
-                        yield f"event: content_block_delta\ndata: {_make_content_block_delta(state['block_index'], 'input_json_delta', partial_json=arg_delta)}"
-                    else:
-                        state["buffered_args"] += arg_delta
+                    state["buffered_args"] += arg_delta
 
             # Handle finish
             if finish_reason:
@@ -407,6 +442,11 @@ def openai_stream_to_anthropic(
 
         for tc_state in tool_blocks.values():
             if tc_state.get("started", False):
+                # Emit buffered (and repaired) tool arguments before closing
+                raw_args = tc_state.get("buffered_args", "")
+                if raw_args:
+                    repaired = _repair_tool_args_json(raw_args)
+                    yield f"event: content_block_delta\ndata: {_make_content_block_delta(tc_state['block_index'], 'input_json_delta', partial_json=repaired)}"
                 yield f"event: content_block_stop\ndata: {_make_content_block_stop(tc_state['block_index'])}"
 
         # Emit message_delta and message_stop
@@ -533,13 +573,21 @@ def responses_stream_to_anthropic(
                 output_index = chunk.get("output_index", 0)
                 delta = chunk.get("delta", "")
                 if output_index in tool_blocks and delta:
-                    block_idx = tool_blocks[output_index]["block_index"]
-                    yield f"event: content_block_delta\ndata: {_make_content_block_delta(block_idx, 'input_json_delta', partial_json=delta)}"
+                    # Buffer args for repair at done event (same strategy
+                    # as chat/completions path — fixes unescaped Windows
+                    # backslashes in file paths).
+                    tool_blocks[output_index].setdefault("buffered_args", "")
+                    tool_blocks[output_index]["buffered_args"] += delta
 
             elif event_type == "response.function_call_arguments.done":
                 output_index = chunk.get("output_index", 0)
                 if output_index in tool_blocks:
                     block_idx = tool_blocks[output_index]["block_index"]
+                    # Emit buffered (and repaired) tool arguments
+                    raw_args = tool_blocks[output_index].get("buffered_args", "")
+                    if raw_args:
+                        repaired = _repair_tool_args_json(raw_args)
+                        yield f"event: content_block_delta\ndata: {_make_content_block_delta(block_idx, 'input_json_delta', partial_json=repaired)}"
                     yield f"event: content_block_stop\ndata: {_make_content_block_stop(block_idx)}"
                     tool_blocks[output_index]["closed"] = True
 
