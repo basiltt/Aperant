@@ -201,7 +201,7 @@ const CLAUDE_BUSY_PATTERNS = [
   /\u25cf/,                         // Unicode bullet point (●)
 
   // Tool execution indicators (Claude is running tools)
-  /^(Read|Write|Edit|Bash|Grep|Glob|Task|WebFetch|WebSearch|TodoWrite)\(/m,
+  /^(Read|Write|Edit|Bash|Grep|Glob|Task|WebFetch|WebSearch|TodoWrite|CronCreate|CronList|CronDelete|NotebookEdit|TaskCreate|TaskGet|TaskList|TaskOutput|TaskStop|TaskUpdate|AskUserQuestion|EnterPlanMode|ExitPlanMode|EnterWorktree|ExitWorktree|LSP|Skill)\(/m,
   /^\s*\d+\s*[│|]\s*/m,            // Line numbers in file output (Claude reading/showing files)
 
   // Streaming/thinking indicators

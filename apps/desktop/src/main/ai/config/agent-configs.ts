@@ -29,8 +29,33 @@ const BASE_WRITE_TOOLS = ['Write', 'Edit', 'Bash'] as const;
 /** Web tools for documentation lookup and research */
 const WEB_TOOLS = ['WebFetch', 'WebSearch'] as const;
 
+/** Cron scheduling tools */
+const CRON_TOOLS = ['CronCreate', 'CronList', 'CronDelete'] as const;
+
+/** Task management tools (interactive sessions) */
+const TASK_TOOLS = ['TaskCreate', 'TaskGet', 'TaskList', 'TaskOutput', 'TaskStop', 'TaskUpdate'] as const;
+
+/** Plan mode tools */
+const PLAN_MODE_TOOLS = ['EnterPlanMode', 'ExitPlanMode'] as const;
+
+/** Worktree tools */
+const WORKTREE_TOOLS = ['EnterWorktree', 'ExitWorktree'] as const;
+
 /** All builtin tools — given to most agents since security is enforced at the tool execution layer */
-const ALL_BUILTIN_TOOLS = [...BASE_READ_TOOLS, ...BASE_WRITE_TOOLS, ...WEB_TOOLS] as const;
+const ALL_BUILTIN_TOOLS = [
+  ...BASE_READ_TOOLS,
+  ...BASE_WRITE_TOOLS,
+  ...WEB_TOOLS,
+  ...CRON_TOOLS,
+  ...TASK_TOOLS,
+  ...PLAN_MODE_TOOLS,
+  ...WORKTREE_TOOLS,
+  'NotebookEdit',
+  'TodoWrite',
+  'AskUserQuestion',
+  'LSP',
+  'Skill',
+] as const;
 
 /** Spec pipeline tools — read codebase + write to spec dir + web research. No Edit, no Bash. */
 const SPEC_TOOLS = [...BASE_READ_TOOLS, 'Write', ...WEB_TOOLS] as const;

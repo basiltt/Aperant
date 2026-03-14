@@ -45,6 +45,10 @@ export {
 export const BASE_READ_TOOLS = ['Read', 'Glob', 'Grep'] as const;
 export const BASE_WRITE_TOOLS = ['Write', 'Edit', 'Bash'] as const;
 export const WEB_TOOLS = ['WebFetch', 'WebSearch'] as const;
+export const CRON_TOOLS = ['CronCreate', 'CronList', 'CronDelete'] as const;
+export const TASK_TOOLS = ['TaskCreate', 'TaskGet', 'TaskList', 'TaskOutput', 'TaskStop', 'TaskUpdate'] as const;
+export const PLAN_MODE_TOOLS = ['EnterPlanMode', 'ExitPlanMode'] as const;
+export const WORKTREE_TOOLS = ['EnterWorktree', 'ExitWorktree'] as const;
 export const TOOL_UPDATE_SUBTASK_STATUS = 'mcp__auto-claude__update_subtask_status';
 export const TOOL_GET_BUILD_PROGRESS = 'mcp__auto-claude__get_build_progress';
 export const TOOL_RECORD_DISCOVERY = 'mcp__auto-claude__record_discovery';
