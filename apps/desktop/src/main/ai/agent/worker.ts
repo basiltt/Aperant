@@ -36,6 +36,7 @@ import type {
 import type { Tool as AITool } from 'ai';
 import type { SessionConfig, StreamEvent, SessionResult } from '../session/types';
 import { BuildOrchestrator } from '../orchestration/build-orchestrator';
+import type { BuildOutcome } from '../orchestration/build-orchestrator';
 import { QALoop } from '../orchestration/qa-loop';
 import { SpecOrchestrator } from '../orchestration/spec-orchestrator';
 import type { SpecPhase } from '../orchestration/spec-orchestrator';
@@ -126,6 +127,10 @@ parentPort.on('message', (msg: MainToWorkerMessage) => {
  * Reconstruct the SecurityProfile from the serialized form in session config.
  * SecurityProfile uses Set objects that can't cross worker boundaries.
  */
+function getBuildFailureEventType(outcome: BuildOutcome): 'PLANNING_FAILED' | 'CODING_FAILED' {
+  return outcome.finalPhase === 'planning' ? 'PLANNING_FAILED' : 'CODING_FAILED';
+}
+
 function buildSecurityProfile(session: SerializableSessionConfig): SecurityProfile {
   const serialized = session.toolContext.securityProfile;
   return {
@@ -710,7 +715,7 @@ async function runBuildOrchestrator(
     });
   } else {
     // Pre-QA failure (planning or coding phase)
-    postTaskEvent('CODING_FAILED', { error: outcome.error });
+    postTaskEvent(getBuildFailureEventType(outcome), { error: outcome.error });
   }
 
   // Map outcome to a SessionResult-compatible result for the bridge
@@ -922,9 +927,11 @@ async function runSpecOrchestrator(
   });
 
   orchestrator.on('phase-complete', (_phase: SpecPhase, _result: unknown) => {
-    // End the current spec log phase so the next one can start fresh
+    // Keep the planning phase active until the full spec run succeeds.
+    // Ending it here marks planning as completed even when the overall
+    // orchestration later fails and never produces a usable plan.
     if (logWriter) {
-      logWriter.endPhase('spec', true);
+      logWriter.flush();
     }
   });
 
